@@ -1,0 +1,32 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+
+namespace IdentitySample.Authorization.ClaimBasedAuthorization.MvcUserAccessClaims
+{
+    public static class MvcClaimValuesUtilities
+    {
+        /// <summary>
+        /// دریافت تمامی فیلد های یک کلاس
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static IEnumerable<(string claimValueEnglish, string claimValuePersian)> GetPersianAndEnglishClaimValues(Type type)
+        {
+            var allConstantsInTheType = type
+                .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Where(field => field.IsLiteral && !field.IsInitOnly)
+                .ToList();
+
+            foreach (var englishClaimValue in allConstantsInTheType.Where(m => !m.Name.Contains("Persian")))
+            {
+                var persianClaimValue = allConstantsInTheType
+                    .Single(m => m.Name == englishClaimValue.Name + "Persian");
+
+                yield return (englishClaimValue.GetValue(null)!.ToString(), persianClaimValue.GetValue(null)!.ToString());
+            }
+        }
+    }
+}
