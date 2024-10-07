@@ -164,7 +164,7 @@ namespace Service.ProjectAction
                             Comment = x.Comment,
                             ProjectActionStatusType = Utility.GetDescriptionOfEnum(typeof(ProjectActionStatusType), x.ProjectActionStatusType),
                             UserFullName = x.UserAssigned.FirstName + " " + x.UserAssigned.LastName,
-                            CreateDate = Utility.GregorianDateToPersianCalendar(x.CreatedDate),
+                            CreateDate = x.CreatedDate.ToPersianDate(),
                             CreateTime = x.CreatedDate.Hour + ":" + x.CreatedDate.Minute,
                             UserPolicyTitle = x.UserRole.Role.Title,
 

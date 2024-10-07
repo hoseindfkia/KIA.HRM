@@ -14,6 +14,20 @@ namespace Share.Enum
         [Description("پروژه")]
         Project = 0,
 
+         /// <summary>
+        /// ماموریت
+        /// </summary>
+        [Description("ماموریت")]
+        Mission = 1,
+
+         /// <summary>
+        /// جلسه
+        /// </summary>
+        [Description("جلسه")]
+        Meeting = 2,
+
+
+
        
     }
 }

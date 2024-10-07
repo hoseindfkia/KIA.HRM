@@ -20,7 +20,7 @@ namespace KIA.HRM.Authorization.ClaimBasedAuthorization.Attributes
             {
                 // You can set the unauthorized response here if needed  
                 context.Result = new UnauthorizedResult();
-                return;
+                    return;
             }
 
             // Check for the required claim  
@@ -37,6 +37,7 @@ namespace KIA.HRM.Authorization.ClaimBasedAuthorization.Attributes
                 {
                     StatusCode = 403 // Set status code to 403 Forbidden  
                 };
+
             }
         }
     }

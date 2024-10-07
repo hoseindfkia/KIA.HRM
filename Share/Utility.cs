@@ -57,31 +57,53 @@ namespace Share
         }
 
 
-        /// <summary>
-        /// تبدیل تاریخ میلادی به شمسی
-        /// </summary>
-        /// <param name="dateTime"></param>
-        /// <returns></returns>
-        public static string GregorianDateToPersianCalendar(DateTime dateTime, bool isTime = false)
-        {
-            try
-            {
-                string persianCalender = "";
-                PersianCalendar pc = new PersianCalendar();
-                if (isTime)
-                    persianCalender = string.Format("{0}/{1}/{2}-{3}:{4}", pc.GetYear(dateTime), pc.GetMonth(dateTime), pc.GetDayOfMonth(dateTime), pc.GetHour(dateTime), pc.GetMinute(dateTime));
-                else
-                    persianCalender = string.Format("{0}/{1}/{2}", pc.GetYear(dateTime), pc.GetMonth(dateTime), pc.GetDayOfMonth(dateTime));
-                return persianCalender;
-            }
-            catch (Exception)
-            {
+        ///// <summary>
+        ///// تبدیل تاریخ میلادی به شمسی
+        ///// </summary>
+        ///// <param name="dateTime"></param>
+        ///// <returns></returns>
+        //public static string GregorianDateToPersianCalendar(DateTime dateTime, bool isTime = false)
+        //{
+        //    try
+        //    {
+        //        string persianCalender = "";
+        //        PersianCalendar pc = new PersianCalendar();
+        //        if (isTime)
+        //            persianCalender = string.Format("{0}/{1}/{2}-{3}:{4}", pc.GetYear(dateTime), pc.GetMonth(dateTime), pc.GetDayOfMonth(dateTime), pc.GetHour(dateTime), pc.GetMinute(dateTime));
+        //        else
+        //            persianCalender = string.Format("{0}/{1}/{2}", pc.GetYear(dateTime), pc.GetMonth(dateTime), pc.GetDayOfMonth(dateTime));
+        //        return persianCalender;
+        //    }
+        //    catch (Exception)
+        //    {
 
-                return "";
-            }
-        }
+        //        return "";
+        //    }
+        //}
 
 
+        ///// <summary>
+        ///// تبدیل تاریخ میلادی به شمسی
+        ///// </summary>
+        ///// <param name="dateTime"></param>
+        ///// <returns></returns>
+        //public static string ToPersianDate(this DateTime dateTime, bool HasTime = false)
+        //{
+        //    PersianCalendar persianCalendar = new PersianCalendar();
+
+        //    // Get the Persian year, month, and day  
+        //    int year = persianCalendar.GetYear(dateTime);
+        //    int month = persianCalendar.GetMonth(dateTime);
+        //    int day = persianCalendar.GetDayOfMonth(dateTime);
+
+        //    // Format the date as a string in the desired format (e.g., "YYYY/MM/DD")  
+        //    return $"{year}/{month:D2}/{day:D2}" + (HasTime ? "-" + dateTime.Hour + ":" + dateTime.Minute : ""); // D2 formats month and day to two digits  
+        //}
+
+
+
+
+        #region Date Convert
         /// <summary>
         /// تبدیل تاریخ میلادی به شمسی
         /// </summary>
@@ -99,6 +121,49 @@ namespace Share
             // Format the date as a string in the desired format (e.g., "YYYY/MM/DD")  
             return $"{year}/{month:D2}/{day:D2}" + (HasTime ? "-" + dateTime.Hour + ":" + dateTime.Minute : ""); // D2 formats month and day to two digits  
         }
+        /// <summary>
+        /// برای این که بتوانیم با تک پارامتری هم کار کنیم
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static string ToPersianDate(this DateTime dateTime)
+        {
+            return dateTime.ToPersianDate(false);
+        }
+
+
+        /// <summary>
+        /// Convert Jalali To Gregorian
+        /// تبدیل تاریخ شمسی به میلادی
+        /// "1403/07/15 14:30:00"
+        /// </summary>
+        /// <param name="jalaliDateString"></param>
+        /// <returns></returns>
+        public static DateTime ToEnglishDateTime(this string jalaliDateString)
+        {
+            // Assuming the input format is "YYYY/MM/DD"  
+            var parts = jalaliDateString.Split('-');
+            var datePart = parts[0];
+            var timePart = parts.Length > 1 ? parts[1] : "00:00:00";
+
+
+            var dateParts = datePart.Split('/');
+            int year = int.Parse(dateParts[0]);
+            int month = int.Parse(dateParts[1]);
+            int day = int.Parse(dateParts[2]);
+
+            var timeParts = timePart.Split(':');
+            int hour = int.Parse(timeParts[0]);
+            int minute = int.Parse(timeParts[1]);
+            int second = int.Parse(timeParts[2]);
+
+            PersianCalendar persianCalendar = new PersianCalendar();
+            DateTime gregorianDate = new DateTime(year, month, day, hour, minute, second, persianCalendar);
+
+            return gregorianDate;
+        }
+
+        #endregion
 
 
     }

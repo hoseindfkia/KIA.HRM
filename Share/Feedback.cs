@@ -74,7 +74,7 @@ namespace Share
         /// <param name="CurrentValueList">لیستی از جوابها</param>
         /// <param name="CurrentMessage">پیامی که کاربر باید مشاهده کند</param>
         /// <param name="CurrentExceptionMessage">پیام خطا برای برنامه نویس</param>
-        public void SetFeedback(FeedbackStatus CurrentStatus, MessageType CurrentMessageType, T CurrentValue, string CurrentMessage, string CurrentExceptionMessage="")
+        public void SetFeedback(FeedbackStatus CurrentStatus, MessageType CurrentMessageType, T CurrentValue, string CurrentMessage, string CurrentExceptionMessage = "")
         {
             Status = CurrentStatus;
             MessageType = CurrentMessageType;
@@ -97,7 +97,7 @@ namespace Share
             ExceptionMessage = CurrentExceptionMessage;
         }
 
-        public void SetFeedback(FeedbackStatus CurrentStatus, MessageType CurrentMessageType,  ModelStateDictionary modelState )
+        public void SetFeedback(FeedbackStatus CurrentStatus, MessageType CurrentMessageType, ModelStateDictionary modelState)
         {
             Status = CurrentStatus;
             MessageType = CurrentMessageType;

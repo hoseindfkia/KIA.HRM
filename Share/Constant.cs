@@ -8,10 +8,10 @@ namespace Share
 {
     public class Constant
     {
-        public const int StringLengthTitle = 256;
-        public const int StringLengthDescription = 512;
+        public const int StringLengthTitle = 512;
+        public const int StringLengthDescription = 4096;
         public const int StringLengthName = 128;
-        public const int StringLengthURL = 1024;
+        public const int StringLengthURL = 4096;
         public const int StringLengthPassword = 128;
         public const int StringLengthEmail = 265;
 

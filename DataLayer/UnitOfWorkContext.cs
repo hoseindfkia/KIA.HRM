@@ -1,4 +1,5 @@
 ﻿using DomainClass;
+using DomainClass.WorkReport;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,13 @@ namespace DataLayer
         public DbSet<FileEntity> Files { get; set; }
         public DbSet<ProjectActionAssignUserEntity> ProjectActionAssignUsers { get; set; }
 
+        #region WorkReport
+
+        public DbSet<PreparationDocumentEntity> PreparationDocuments { get; set; }
+        public DbSet<MeetingEntity> Meetings { get; set; }
+        public DbSet<MissionEntity> Missions { get; set; }
+        public DbSet<LeaveEntity> Leaves { get; set; }
+        #endregion
 
 
 
@@ -49,16 +57,21 @@ namespace DataLayer
             modelBuilder.Entity<DegreeTypeEntity>().ToTable("DegreeType");
             modelBuilder.Entity<RoleAccessEntity>().ToTable("RoleAccess");
             modelBuilder.Entity<FileEntity>().ToTable("File");
+
+            modelBuilder.Entity<PreparationDocumentEntity>().ToTable("PreparationDocument");
+            modelBuilder.Entity<MeetingEntity>().ToTable("Meeting");
+            modelBuilder.Entity<MissionEntity>().ToTable("Mission");
+            modelBuilder.Entity<LeaveEntity>().ToTable("Leave");
             #endregion
 
             #region Config
-           
+
             modelBuilder.Entity<UserEntity>()
                 .HasMany(x => x.ProjectActionOrigins)
                 .WithOne(x => x.UserOrigin)
                 .HasForeignKey(x => x.UserOriginId)
                 .OnDelete(DeleteBehavior.Restrict);
-         
+
             modelBuilder.Entity<UserEntity>()
                 .HasMany(x => x.ProjectActionAssignUsers)
                 .WithOne(x => x.UserAssigned)

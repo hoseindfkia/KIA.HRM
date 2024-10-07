@@ -1,4 +1,5 @@
-﻿using Share;
+﻿using DomainClass.WorkReport;
+using Share;
 using Share.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -33,15 +34,19 @@ namespace DomainClass
         /// فایل انکریپت شده است یا خیر
         /// انکریپت به صورت اختصاصی است؟ یعنی به ازای هر فایل انکریپت خاص خود تخصیص داده شود
         /// </summary>
-        public  bool IsPrivateEncryption { get; }
+        public bool IsPrivateEncryption { get; }
         /// <summary>
         /// فایل انکریپت است یا خیر؟
         /// انکریپت به صورت عمومی است- یعنی با استفاده از یک کلید عمومی برای انکریپت استفاده شود
         /// در پروژه شیر Constant  موجود در فایل 
         /// </summary>
-        public bool IsPublicEncryption { get;  }
+        public bool IsPublicEncryption { get; }
 
-      
+        /// <summary>
+        /// کلید انکریپشن
+        /// </summary>
+        public byte[] EncryptionKey { get; set; }
+
         #endregion
 
         #region لیست ارتباطات
@@ -50,6 +55,12 @@ namespace DomainClass
 
         [InverseProperty(nameof(CryptographyEntity.File))]
         public virtual CryptographyEntity Cryptography { get; set; }
+
+        [InverseProperty(nameof(MeetingFileEntity.File))]
+        public virtual ICollection<MeetingFileEntity> MeetingFiles { get; set; } = new List<MeetingFileEntity>();
+
+        [InverseProperty(nameof(MissionFileEntity.File))]
+        public virtual ICollection<MissionFileEntity> MissionFiles { get; set; } = new List<MissionFileEntity>();
 
         #endregion
     }

@@ -4,6 +4,7 @@ using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(UnitOfWorkContext))]
-    partial class UnitOfWorkContextModelSnapshot : ModelSnapshot
+    [Migration("20241007065423_workReportEntities-14030716-1")]
+    partial class workReportEntities140307161
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -398,7 +401,7 @@ namespace DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("ApproverUserId")
+                    b.Property<long>("ApproverUserId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedDate")
@@ -428,7 +431,7 @@ namespace DataLayer.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("UserCreatorId")
+                    b.Property<long>("UserCreator")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -444,7 +447,7 @@ namespace DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("ApproverUserId")
+                    b.Property<long>("ApproverUserId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedDate")
@@ -474,7 +477,7 @@ namespace DataLayer.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("UserCreatorId")
+                    b.Property<long>("UserCreator")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -516,7 +519,7 @@ namespace DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("ApproverUserId")
+                    b.Property<long>("ApproverUserId")
                         .HasColumnType("bigint");
 
                     b.Property<int>("CityId")
@@ -552,7 +555,7 @@ namespace DataLayer.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("UserCreatorId")
+                    b.Property<long>("UserCreator")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -594,7 +597,7 @@ namespace DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("ApproverUserId")
+                    b.Property<long>("ApproverUserId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreatedDate")
@@ -606,9 +609,6 @@ namespace DataLayer.Migrations
 
                     b.Property<long>("DocumentId")
                         .HasColumnType("bigint");
-
-                    b.Property<int>("DocumentVersion")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("FromDate")
                         .HasColumnType("datetime2");
@@ -627,7 +627,7 @@ namespace DataLayer.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long?>("UserCreatorId")
+                    b.Property<long>("UserCreator")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");

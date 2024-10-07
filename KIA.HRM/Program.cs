@@ -2,20 +2,10 @@
 using DataLayer.MongoDB;
 using DomainClass.Main;
 using DomainClass.Mongo;
-using FileService;
 using KIA.HRM.Extensions;
 using KIA.HRM.Middleware;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using MongoDB.Driver.Core.Configuration;
-using Service.Degree;
-using Service.Mongo;
-using Service.Project;
-using Service.ProjectAction;
-using Service.ProjectActionAssignUser;
-using System.Runtime;
 
 
 var builder = WebApplication.CreateBuilder(args);
