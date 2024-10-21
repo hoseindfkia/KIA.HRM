@@ -18,9 +18,11 @@ namespace KIA.HRM.Controllers.WorkReport
         }
 
         // POST api/<MeetingController>
-        [HttpPost]
+        [HttpPost("AddMeeting")]
         public async Task<Feedback<int>> Post(MeetingPostViewModel MeetingPost)
         {
+            if (!ModelState.IsValid)
+                return (new Feedback<int>()).SetFeedbackNew(Share.Enum.FeedbackStatus.InvalidDataFormat, Share.Enum.MessageType.Error, 0, ModelState.GetModelStateErrors());
             return await _meetingService.AddAsycn(MeetingPost, UserId: 0);
         }
 

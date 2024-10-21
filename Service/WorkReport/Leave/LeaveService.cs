@@ -30,16 +30,25 @@ namespace Service.WorkReport.Leave
         /// <returns></returns>
         public async Task<Feedback<int>> AddAsycn(LeavePostViewModel LeavePost, long UserId)
         {
+
+            //TODO:  ساعت باید از ساعت زن خوانده شود
+            TimeOnly startTime = new TimeOnly(7, 30, 0); // 07:30 AM  
+            TimeOnly endTime = new TimeOnly(17, 0, 0); // 05:00 PM  
+            DateTime startDate = new DateTime(LeavePost.FromDate.Year, LeavePost.FromDate.Month, LeavePost.FromDate.Day, startTime.Hour,startTime.Minute,0);
+            DateTime endDate = new DateTime(LeavePost.ToDate.Year, LeavePost.ToDate.Month, LeavePost.ToDate.Day, endTime.Hour, endTime.Minute, 0);
+
+
             var FbOut = new Feedback<int>();
+            //TODO: مرخصی نباید تکراری ثبت شود
             var LeaveModel = new LeaveEntity()
             {
                 Title = LeavePost.Title,
                 Description = LeavePost.Description,
                 LeaveType = LeavePost.LeaveType,
-                FromDate = LeavePost.FromDatePersian.ToEnglishDateTime(),
-                ToDate = LeavePost.ToDatePersian.ToEnglishDateTime(),
+                FromDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ? startDate :   LeavePost.FromDate   , // روزانه ها از ساعت تا ساعت ندارد
+                ToDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ?  endDate : LeavePost.ToDate ,// روزانه ها از ساعت تا ساعت ندارد
                 ApproverUserId = null,
-                CreatedDate = DateTime.Now,
+                CreatedDate =  DateTime.Now,
                 UpdatedDate = DateTime.Now,
                 IsAccepted = null,
                 UserCreatorId = null,
@@ -58,13 +67,16 @@ namespace Service.WorkReport.Leave
         public async Task<Feedback<IList<LeaveViewModel>>> GetByDateAsync(DateTime dateTime, long UserId)
         {
             var FbOut = new Feedback<IList<LeaveViewModel>>();
-            var EntityList = await _Entity.Where(x=> x.FromDate == dateTime).Select(x => new LeaveViewModel()
+            // var dateTimeDate = dateTime.dateon;
+
+            var EntityList = await _Entity.Where(x => x.FromDate.Date == dateTime.Date).Select(x => new LeaveViewModel()
             {
                 Title = x.Title,
                 Description = x.Description,
                 LeaveType = x.LeaveType,
-                FromDatePersian = x.FromDate.ToPersianDate(),
-                ToDatePersian = x.ToDate.ToPersianDate(),
+                FromDatePersian = x.FromDate.ToPersianDate(true),
+                ToDatePersian = x.ToDate.ToPersianDate(true),
+                DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes
             }
             ).AsNoTracking().ToListAsync();
             if (EntityList.Any())

@@ -1,7 +1,12 @@
-﻿using DomainClass;
+﻿using Azure.Core;
+using DomainClass;
 using DomainClass.Mongo;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson.IO;
 using Service.Mongo;
+using System.Text;
+using System.Text.Json;
+using ViewModel.WorkReport.Leave;
 
 namespace KIA.HRM.Middleware;
 
@@ -29,12 +34,29 @@ public class ExceptionLoggingMiddleware
         }
         catch (Exception ex)
         {
+
+            var BodyRequest = "";
+
+            //// Read the request body  
+            //using var reader = new StreamReader(context.Request.Body);
+            //var body = await reader.ReadToEndAsync();
+
+            //// Deserialize to the model  
+            //var model = JsonSerializer.Deserialize<LeavePostViewModel>(body);
+
+
             var userAgent = context.Request.Headers["User-Agent"];
             var userId = ((UserEntity?)context.Items["User"])?.Id;
             var path = context.Request.Path;
             var browser = context.Request.Headers["sec-ch-ua"];
             var platform = context.Request.Headers["sec-ch-ua-platform"];
-
+            Share.Enum.HttpRequestType HttpRequestType = 0;
+            if (context.Request.Method == "GET")
+                HttpRequestType = Share.Enum.HttpRequestType.GET;
+            if (context.Request.Method == "POST")
+                HttpRequestType = Share.Enum.HttpRequestType.POST;
+            if (context.Request.Method == "DELETE")
+                HttpRequestType = Share.Enum.HttpRequestType.DELETE;
             var logEntity = new LoggerEntity()
             {
                 Device = "",
@@ -44,12 +66,14 @@ public class ExceptionLoggingMiddleware
                 Browser = browser,
                 Path = path,
                 Platform = platform + "--" + userAgent,
-                CreateDateTime = DateTime.UtcNow,   
+                CreateDateTime = DateTime.UtcNow,
+                HttpRequestType = HttpRequestType,
+                RequestBody = BodyRequest,
             };
             // یک لاگ در مونگو ذخیره می شود
             await _mongoService.CreateAsync(logEntity);
 
-          // جهت تست  var mongoLogs = await _mongoService.GetAllAsync();
+            // جهت تست  var mongoLogs = await _mongoService.GetAllAsync();
 
             #region نمایش خطا در خروجی
             // برای نمایش خطا در خروجی - کاربر عادی نباید خطا را مشاهده کند پس در قسمت تنظیمات باید میدلور جدا برای نمایش در خروجی بنویسم
@@ -65,6 +89,8 @@ public class ExceptionLoggingMiddleware
             throw;
         }
     }
+
+
 }
 //public class ExceptionLoggingMiddleware
 //{

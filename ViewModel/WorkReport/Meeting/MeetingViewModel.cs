@@ -16,6 +16,8 @@ namespace ViewModel.WorkReport.Meeting
 
         public IList<FileViewModel> Files { get; set; }
 
+        public long DurationMinuets { get; set; }
+
         //public long ProjectId { get; set; }
 
     }

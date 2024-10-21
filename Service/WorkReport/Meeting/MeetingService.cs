@@ -39,8 +39,8 @@ namespace Service.WorkReport.Meeting
                 {
                     Title = MeetingPost.Title,
                     Description = MeetingPost.Description,
-                    FromDate = MeetingPost.FromDatePersian.ToEnglishDateTime(),
-                    ToDate = MeetingPost.ToDatePersian.ToEnglishDateTime(),
+                    FromDate = MeetingPost.FromDate,
+                    ToDate = MeetingPost.ToDate,
                     ApproverUserId = null,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
@@ -69,14 +69,15 @@ namespace Service.WorkReport.Meeting
         public async Task<Feedback<IList<MeetingViewModel>>> GetByDateAsync(DateTime dateTime, long UserId)
         {
             var FbOut = new Feedback<IList<MeetingViewModel>>();
-            var MeetingList = await _Entity.Where(x => x.FromDate == dateTime).Select(x => new MeetingViewModel()
+            var MeetingList = await _Entity.Where(x => x.FromDate.Date == dateTime.Date).Select(x => new MeetingViewModel()
             {
                 Title = x.Title,
                 Description = x.Description,
-                FromDatePersian = x.FromDate.ToPersianDate(),
-                ToDatePersian = x.ToDate.ToPersianDate(),
+                FromDatePersian = x.FromDate.ToPersianDate(true),
+                ToDatePersian = x.ToDate.ToPersianDate(true),
+                DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes
                 //Files = x.MeetingFiles.Select(x => new MeetingFileEntity() { 
-                
+
                 //}).ToList(),
             }).AsNoTracking().ToListAsync();
             if(MeetingList.Any())

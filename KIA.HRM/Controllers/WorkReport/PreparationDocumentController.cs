@@ -19,9 +19,11 @@ namespace KIA.HRM.Controllers.WorkReport
         }
 
         
-        [HttpPost]
+        [HttpPost("AddPreparationDocument")]
         public async Task<Feedback<int>> Post(PreparationDocumentPostViewModel PreparationDocumentPost )
         {
+            if (!ModelState.IsValid)
+                return (new Feedback<int>()).SetFeedbackNew(Share.Enum.FeedbackStatus.InvalidDataFormat, Share.Enum.MessageType.Error, 0, ModelState.GetModelStateErrors());
             return await _preparationDocumentService.AddAsycn(PreparationDocumentPost, UserId: 0);
         }
 

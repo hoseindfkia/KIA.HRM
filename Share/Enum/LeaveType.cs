@@ -13,27 +13,27 @@ namespace Share.Enum
     public  enum LeaveType
     {
         /// <summary>
-        /// امکان ارتباط با سرور میسر نمی باشد
+        /// امرخصی ساعتی
         /// </summary>
         [Description("مرخصی ساعتی")]
         Hourary = 0,
         /// <summary>
-        /// امکان ارتباط با پایگاه داده میسر نمی باشد
+        /// مرخصی روزانه
         /// </summary>
         [Description("مرخصی روزانه")]
         Daily = 1,
-         /// <summary>
-        /// امکان ارتباط با سرور میسر نمی باشد
+        /// <summary>
+        /// مرخصی استعلاجی
         /// </summary>
         [Description("مرخصی استعلاجی")]
         Illness = 2,
         /// <summary>
-        /// امکان ارتباط با پایگاه داده میسر نمی باشد
+        /// مرخصی استحقاقی
         /// </summary>
         [Description("مرخصی استحقاقی")]
         Statutory = 3,
-         /// <summary>
-        /// امکان ارتباط با پایگاه داده میسر نمی باشد
+        /// <summary>
+        /// مرخصی تشویقی
         /// </summary>
         [Description("مرخصی تشویقی")]
         Reward = 4,

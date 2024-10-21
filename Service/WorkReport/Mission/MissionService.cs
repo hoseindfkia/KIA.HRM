@@ -40,6 +40,13 @@ namespace Service.WorkReport.Mission
             /// ابتدا فایل های آپلود شده مسیر و بقیه تنظیماتش در دیتابیس ذخیره شود سپس لیست آن در انتیتی ذخیره گردد.
             var Files = await _fileService.AddRangeAsycn(MissionPost.Files, UserId);
 
+            //TODO:  ساعت باید از ساعت زن خوانده شود
+            TimeOnly startTime = new TimeOnly(7, 30, 0); // 07:30 AM  
+            TimeOnly endTime = new TimeOnly(17, 0, 0); // 05:00 PM  
+            DateTime startDate = new DateTime(MissionPost.FromDate.Year, MissionPost.FromDate.Month, MissionPost.FromDate.Day, startTime.Hour, startTime.Minute, 0);
+            DateTime endDate = new DateTime(MissionPost.ToDate.Year, MissionPost.ToDate.Month, MissionPost.ToDate.Day, endTime.Hour, endTime.Minute, 0);
+
+
             if (Files.Status == Share.Enum.FeedbackStatus.UpdatedSuccessful)
 
             {
@@ -47,8 +54,8 @@ namespace Service.WorkReport.Mission
                 {
                     Title = MissionPost.Title,
                     Description = MissionPost.Description,
-                    FromDate = MissionPost.FromDatePersian.ToEnglishDateTime(),
-                    ToDate = MissionPost.ToDatePersian.ToEnglishDateTime(),
+                    FromDate = MissionPost.MissionType == Share.Enum.MissionType.Daily ? startDate : MissionPost.FromDate, // روزانه ها از ساعت تا ساعت ندارد
+                    ToDate = MissionPost.MissionType == Share.Enum.MissionType.Daily ? endDate : MissionPost.ToDate,// روزانه ها از ساعت تا ساعت ندارد
                     ApproverUserId = null,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
@@ -59,7 +66,8 @@ namespace Service.WorkReport.Mission
                     {
                         File = file
                     }).ToList(),
-                    ProjectId = 0
+                    ProjectId = 0,
+                    CityId  = MissionPost.CityId,
                 };
                 _Entity.Add(MissionModel);
                 await _Context.SaveChangesAsync();
@@ -78,17 +86,18 @@ namespace Service.WorkReport.Mission
         public async Task<Feedback<IList<MissionViewModel>>> GetByDate(DateTime dateTime, long UserId)
         {
             var FbOut = new Feedback<IList<MissionViewModel>>();
-            var MissionList = await _Entity.Where(x => x.FromDate == dateTime || x.ToDate ==dateTime)
+            var MissionList = await _Entity.Where(x => x.FromDate.Date == dateTime.Date || x.ToDate.Date ==dateTime.Date)
                                           .Select(x => new MissionViewModel
                                           {
                                               Title = x.Title,
                                               Description = x.Description,
-                                              FromDatePersian = x.FromDate.ToPersianDate(),
-                                              ToDatePersian = x.ToDate.ToPersianDate(),
+                                              FromDatePersian = x.FromDate.ToPersianDate(true),
+                                              ToDatePersian = x.ToDate.ToPersianDate(true),
                                               CityName = "",
                                               //Files = x.MeetingFiles.Select(x => new MeetingFileEntity() { 
                                               //}).ToList(),
-                                              MissionType = x.MissionType
+                                              MissionType = x.MissionType,
+                                              DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes
                                           }).AsNoTracking().ToListAsync();
             if (MissionList.Any())
                 return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.FetchSuccessful, Share.Enum.MessageType.Info, MissionList, "");

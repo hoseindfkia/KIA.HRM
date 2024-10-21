@@ -17,6 +17,8 @@ namespace ViewModel.WorkReport.Mission
         public IList<FileViewModel> Files { get; set; }
         public MissionType MissionType { get; set; }
         public string CityName { get; set; }
+
+        public long DurationMinuets { get; set; }
         //public long ProjectId { get; set; }
     }
 }

@@ -35,6 +35,12 @@ namespace DataLayer
         public DbSet<RoleAccessEntity> RoleAccesss { get; set; }
         public DbSet<FileEntity> Files { get; set; }
         public DbSet<ProjectActionAssignUserEntity> ProjectActionAssignUsers { get; set; }
+        public DbSet<CityEntity> Cities { get; set; }
+        public DbSet<ProvinceEntity> Provinces{ get; set; }
+        public DbSet<CalendarDayEntity> CalendarDays { get; set; }
+
+
+
 
         #region WorkReport
 
@@ -57,6 +63,10 @@ namespace DataLayer
             modelBuilder.Entity<DegreeTypeEntity>().ToTable("DegreeType");
             modelBuilder.Entity<RoleAccessEntity>().ToTable("RoleAccess");
             modelBuilder.Entity<FileEntity>().ToTable("File");
+            modelBuilder.Entity<CityEntity>().ToTable("City");
+            modelBuilder.Entity<ProvinceEntity>().ToTable("Province");
+            modelBuilder.Entity<CalendarDayEntity>().ToTable("CalendarDay");
+
 
             modelBuilder.Entity<PreparationDocumentEntity>().ToTable("PreparationDocument");
             modelBuilder.Entity<MeetingEntity>().ToTable("Meeting");

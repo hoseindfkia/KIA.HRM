@@ -32,6 +32,16 @@ namespace DomainClass.WorkReport
         #region Relations
         [InverseProperty(nameof(MissionFileEntity.Mission))]
         public virtual ICollection<MissionFileEntity> MissionFiles { get; set; } = new List<MissionFileEntity>();
+
+
+        #endregion
+
+
+        #region Relations
+
+        [InverseProperty(nameof(CityEntity.Missions))]
+        [ForeignKey(nameof(CityId))]
+        public virtual CityEntity City { get; set; }
         #endregion
 
 

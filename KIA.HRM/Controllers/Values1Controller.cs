@@ -6,7 +6,7 @@ namespace KIA.HRM.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class Values1Controller : ControllerBase
     {
         // GET: api/<ValuesController>
         [HttpGet]

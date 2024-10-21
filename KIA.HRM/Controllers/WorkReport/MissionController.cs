@@ -18,9 +18,11 @@ namespace KIA.HRM.Controllers.WorkReport
         }
 
         // POST api/<MissionController>
-        [HttpPost]
+        [HttpPost("AddMission")]
         public async Task<Feedback<int>> Post(MissionPostViewModel MissionPost)
         {
+            if (!ModelState.IsValid)
+                return (new Feedback<int>()).SetFeedbackNew(Share.Enum.FeedbackStatus.InvalidDataFormat, Share.Enum.MessageType.Error, 0, ModelState.GetModelStateErrors());
             return await _missionService.AddAsycn(MissionPost, UserId: 0);
         }
 

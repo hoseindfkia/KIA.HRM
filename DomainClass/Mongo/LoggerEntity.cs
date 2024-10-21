@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Share.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,8 @@ namespace DomainClass.Mongo
 
         public string Platform { get; set; }
 
+        public string RequestBody { get; set; }
+        public HttpRequestType HttpRequestType { get; set; }
         public DateTime CreateDateTime { get; set; }
     }
 }

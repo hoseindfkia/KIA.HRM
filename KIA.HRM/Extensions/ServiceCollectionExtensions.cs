@@ -1,11 +1,14 @@
 ﻿using DataLayer;
 using FileService;
+using Service.CalendarDay;
+using Service.City;
 using Service.Degree;
 using Service.File;
 using Service.Mongo;
 using Service.Project;
 using Service.ProjectAction;
 using Service.ProjectActionAssignUser;
+using Service.Province;
 using Service.WorkReport.Leave;
 using Service.WorkReport.Meeting;
 using Service.WorkReport.Mission;
@@ -27,6 +30,10 @@ namespace KIA.HRM.Extensions
             Services.AddScoped<IFileManagerService, FileManagerService>();
             Services.AddScoped<IProjectActionAssignUserService, ProjectActionAssignUserService>();
             Services.AddScoped<IFileService, Service.File.FileService>();
+            Services.AddScoped<ICityService , CityService>();
+            Services.AddScoped<IProvinceService , ProvinceService>();
+            Services.AddScoped<ICalendarDayService ,CalendarDayService>();
+
 
             // WorkReport
             Services.AddScoped<ILeaveService, LeaveService>();

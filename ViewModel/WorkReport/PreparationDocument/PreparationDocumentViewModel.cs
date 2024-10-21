@@ -14,6 +14,7 @@ namespace ViewModel.WorkReport.PreparationDocument
         public string ToDatePersian { get; set; }
         public int DocumentVersion { get; set; }
 
+        public long DurationMinuets { get; set; }
         //public long DocumentId { get; set; }
     }
 }

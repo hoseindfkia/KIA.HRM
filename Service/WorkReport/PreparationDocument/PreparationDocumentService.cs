@@ -35,8 +35,8 @@ namespace Service.WorkReport.PreparationDocument
             {
                 Title = PreparationDocumentPost.Title,
                 Description = PreparationDocumentPost.Description,
-                FromDate = PreparationDocumentPost.FromDatePersian.ToEnglishDateTime(),
-                ToDate = PreparationDocumentPost.ToDatePersian.ToEnglishDateTime(),
+                FromDate = PreparationDocumentPost.FromDate,
+                ToDate = PreparationDocumentPost.ToDate,
                 ApproverUserId = null,
                 CreatedDate = DateTime.Now,
                 UpdatedDate = DateTime.Now,
@@ -53,14 +53,15 @@ namespace Service.WorkReport.PreparationDocument
         public async Task<Feedback<IList<PreparationDocumentViewModel>>> GetByDateAsync(DateTime dateTime, long UserId)
         {
             var FbOut = new Feedback<IList<PreparationDocumentViewModel>>();
-            var PreparationDocumentList = await _Entity.Where(x => x.FromDate == dateTime)
+            var PreparationDocumentList = await _Entity.Where(x => x.FromDate.Date == dateTime.Date)
                                                         .Select(x => new PreparationDocumentViewModel()
                                                         {
                                                             Title = x.Title,
                                                             Description = x.Description,
-                                                            FromDatePersian = x.FromDate.ToPersianDate(),
-                                                            ToDatePersian = x.ToDate.ToPersianDate(),
+                                                            FromDatePersian = x.FromDate.ToPersianDate(true),
+                                                            ToDatePersian = x.ToDate.ToPersianDate(true),
                                                             DocumentVersion = x.DocumentVersion,
+                                                            DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes
                                                         }).AsNoTracking()
                                                        .ToListAsync();
             if (PreparationDocumentList.Any())

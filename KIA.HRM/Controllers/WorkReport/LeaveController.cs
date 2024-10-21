@@ -18,11 +18,13 @@ namespace KIA.HRM.Controllers.WorkReport
         }
 
 
-        [HttpPost]
-        public Task<Feedback<int>> Post(LeavePostViewModel LeavePost)
+        [HttpPost("AddLeave")]
+        public async Task<Feedback<int>> Post(LeavePostViewModel LeavePost)
         {
+            if (!ModelState.IsValid)
+                return (new Feedback<int>()).SetFeedbackNew(Share.Enum.FeedbackStatus.InvalidDataFormat, Share.Enum.MessageType.Error, 0, ModelState.GetModelStateErrors());
             var UserId = 0;
-            return _leaveService.AddAsycn(LeavePost, UserId);
+            return await _leaveService.AddAsycn(LeavePost, UserId);
         }
 
     }

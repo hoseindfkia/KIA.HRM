@@ -22,6 +22,77 @@ namespace DataLayer.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DomainClass.CalendarDayEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Day")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DayPersianName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("HolidayName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsHoliday")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MonthType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CalendarDay", (string)null);
+                });
+
+            modelBuilder.Entity("DomainClass.CityEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProvinceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.ToTable("City", (string)null);
+                });
+
             modelBuilder.Entity("DomainClass.CryptographyEntity", b =>
                 {
                     b.Property<long>("Id")
@@ -254,6 +325,27 @@ namespace DataLayer.Migrations
                     b.HasIndex("ProjectActionId");
 
                     b.ToTable("ProjectFileEntity");
+                });
+
+            modelBuilder.Entity("DomainClass.ProvinceEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Province", (string)null);
                 });
 
             modelBuilder.Entity("DomainClass.RoleAccessEntity", b =>
@@ -557,6 +649,8 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CityId");
+
                     b.ToTable("Mission", (string)null);
                 });
 
@@ -633,6 +727,17 @@ namespace DataLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PreparationDocument", (string)null);
+                });
+
+            modelBuilder.Entity("DomainClass.CityEntity", b =>
+                {
+                    b.HasOne("DomainClass.ProvinceEntity", "Province")
+                        .WithMany("Cities")
+                        .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Province");
                 });
 
             modelBuilder.Entity("DomainClass.CryptographyEntity", b =>
@@ -768,6 +873,17 @@ namespace DataLayer.Migrations
                     b.Navigation("Meeting");
                 });
 
+            modelBuilder.Entity("DomainClass.WorkReport.MissionEntity", b =>
+                {
+                    b.HasOne("DomainClass.CityEntity", "City")
+                        .WithMany("Missions")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+                });
+
             modelBuilder.Entity("DomainClass.WorkReport.MissionFileEntity", b =>
                 {
                     b.HasOne("DomainClass.FileEntity", "File")
@@ -785,6 +901,11 @@ namespace DataLayer.Migrations
                     b.Navigation("File");
 
                     b.Navigation("Mission");
+                });
+
+            modelBuilder.Entity("DomainClass.CityEntity", b =>
+                {
+                    b.Navigation("Missions");
                 });
 
             modelBuilder.Entity("DomainClass.DegreeTypeEntity", b =>
@@ -813,6 +934,11 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DomainClass.ProjectEntity", b =>
                 {
                     b.Navigation("ProjectActions");
+                });
+
+            modelBuilder.Entity("DomainClass.ProvinceEntity", b =>
+                {
+                    b.Navigation("Cities");
                 });
 
             modelBuilder.Entity("DomainClass.RoleEntity", b =>

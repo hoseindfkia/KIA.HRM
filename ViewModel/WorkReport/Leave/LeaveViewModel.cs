@@ -16,5 +16,7 @@ namespace ViewModel.WorkReport.Leave
         public string ToDatePersian { get; set; }
         public LeaveType LeaveType { get; set; }
 
+        public long  DurationMinuets { get; set; }
+
     }
 }

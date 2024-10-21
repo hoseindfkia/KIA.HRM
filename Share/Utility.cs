@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Share.Enum;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -139,31 +141,128 @@ namespace Share
         /// </summary>
         /// <param name="jalaliDateString"></param>
         /// <returns></returns>
-        public static DateTime ToEnglishDateTime(this string jalaliDateString)
+        public static DateTime? ToEnglishDateTime(this string jalaliDateString)
         {
-            // Assuming the input format is "YYYY/MM/DD"  
-            var parts = jalaliDateString.Split('-');
-            var datePart = parts[0];
-            var timePart = parts.Length > 1 ? parts[1] : "00:00:00";
+            try
+            {
+                // Assuming the input format is "YYYY/MM/DD"  
+                var parts = jalaliDateString.Split('-');
+                var datePart = parts[0];
+                var timePart = parts.Length > 1 ? parts[1] : "00:00:00";
 
 
-            var dateParts = datePart.Split('/');
-            int year = int.Parse(dateParts[0]);
-            int month = int.Parse(dateParts[1]);
-            int day = int.Parse(dateParts[2]);
+                var dateParts = datePart.Split('/');
+                int year = int.Parse(dateParts[0]);
+                int month = int.Parse(dateParts[1]);
+                int day = int.Parse(dateParts[2]);
 
-            var timeParts = timePart.Split(':');
-            int hour = int.Parse(timeParts[0]);
-            int minute = int.Parse(timeParts[1]);
-            int second = int.Parse(timeParts[2]);
+                var timeParts = timePart.Split(':');
+                int hour = int.Parse(timeParts[0]);
+                int minute = int.Parse(timeParts[1]);
+                int second = 0;//int.Parse(timeParts[2]);
 
-            PersianCalendar persianCalendar = new PersianCalendar();
-            DateTime gregorianDate = new DateTime(year, month, day, hour, minute, second, persianCalendar);
-
-            return gregorianDate;
+                PersianCalendar persianCalendar = new PersianCalendar();
+                DateTime gregorianDate = new DateTime(year, month, day, hour, minute, second, persianCalendar);
+                return gregorianDate;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         #endregion
+
+
+        #region Date
+
+
+        public static string GetDayOfWeek(DayOfWeek dayOfWeek)
+        {
+            switch (dayOfWeek)
+            {
+                case DayOfWeek.Saturday:
+                    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.Shanbeh);
+                case DayOfWeek.Sunday:
+                    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.YekShanbeh);
+                case DayOfWeek.Monday:
+                    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.DoShanbeh);
+                case DayOfWeek.Tuesday:
+                    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.SeShanbeh);
+                case DayOfWeek.Wednesday:
+                    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.ChaharShanbeh);
+                case DayOfWeek.Thursday:
+                    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.PanjShanbeh);
+                //case DayOfWeek.Friday:
+                //    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.Jomee);
+                default:
+                    return Utility.GetDescriptionOfEnum(typeof(Share.Enum.PersianDayOfWeekType), Share.Enum.PersianDayOfWeekType.Jomee);
+
+            };
+        }
+        public static PersianDayOfWeekType GetDayOfWeekPersian(DayOfWeek dayOfWeek)
+        {
+            switch (dayOfWeek)
+            {
+                case DayOfWeek.Saturday: return Share.Enum.PersianDayOfWeekType.Shanbeh;
+                case DayOfWeek.Sunday: return Share.Enum.PersianDayOfWeekType.YekShanbeh;
+                case DayOfWeek.Monday: return Share.Enum.PersianDayOfWeekType.DoShanbeh;
+                case DayOfWeek.Tuesday: return Share.Enum.PersianDayOfWeekType.SeShanbeh;
+                case DayOfWeek.Wednesday: return Share.Enum.PersianDayOfWeekType.ChaharShanbeh;
+                case DayOfWeek.Thursday: return Share.Enum.PersianDayOfWeekType.PanjShanbeh;
+                default: return Share.Enum.PersianDayOfWeekType.Jomee;
+            };
+        }
+
+
+        public static MonthType GetMonthType(int Month)
+        {
+            switch (Month)
+            {
+                case 1:
+                    return MonthType.Farvardin;
+                case 2:
+                    return MonthType.Ordibehesht;
+                case 3:
+                    return MonthType.Khordad;
+                case 4:
+                    return MonthType.Tir;
+                case 5:
+                    return MonthType.Mordad;
+                case 6:
+                    return MonthType.Shahrivar;
+                case 7:
+                    return MonthType.Mehr;
+                case 8:
+                    return MonthType.Aban;
+                case 9:
+                    return MonthType.Azar;
+                case 10:
+                    return MonthType.Day;
+                case 11:
+                    return MonthType.Bahman;
+                default:
+                    return MonthType.Esfand;
+            };
+        }
+        #endregion
+
+
+        #region را در خروجی به صورت رشته ایی باز می گرداند ModelState  لیست خطاهای  
+
+
+        public static string GetModelStateErrors(this ModelStateDictionary ModelState)
+        {
+            var errors = ModelState.Where(e => e.Value.Errors.Any())
+            .SelectMany(e => e.Value.Errors.Select(err => err.ErrorMessage))
+            .ToList();
+            return errors.Count > 0 ? string.Join(" | ", errors) : string.Empty;
+        }
+
+
+        #endregion
+
+
 
 
     }

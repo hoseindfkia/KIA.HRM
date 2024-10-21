@@ -13,12 +13,12 @@ namespace Share.Enum
     public enum MissionType
     {
         /// <summary>
-        /// امکان ارتباط با سرور میسر نمی باشد
+        /// ماموریت ساعتی
         /// </summary>
         [Description("ماموریت ساعتی")]
         Hourary = 0,
         /// <summary>
-        /// امکان ارتباط با پایگاه داده میسر نمی باشد
+        /// ماموریت روزانه
         /// </summary>
         [Description("ماموریت روزانه")]
         Daily = 1,
