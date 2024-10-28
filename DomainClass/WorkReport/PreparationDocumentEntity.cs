@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,10 @@ namespace DomainClass.WorkReport
         #endregion
 
         #region Relations
+
+        [InverseProperty(nameof(DocumentEntity.PreparationDocuments))]
+        [ForeignKey(nameof(DocumentId))]
+        public virtual DocumentEntity Document { get; set; }
         #endregion
     }
 }

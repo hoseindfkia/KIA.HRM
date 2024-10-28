@@ -38,6 +38,7 @@ namespace DataLayer
         public DbSet<CityEntity> Cities { get; set; }
         public DbSet<ProvinceEntity> Provinces{ get; set; }
         public DbSet<CalendarDayEntity> CalendarDays { get; set; }
+        public DbSet<DocumentEntity> Documents { get; set; }
 
 
 
@@ -66,6 +67,7 @@ namespace DataLayer
             modelBuilder.Entity<CityEntity>().ToTable("City");
             modelBuilder.Entity<ProvinceEntity>().ToTable("Province");
             modelBuilder.Entity<CalendarDayEntity>().ToTable("CalendarDay");
+            modelBuilder.Entity<DocumentEntity>().ToTable("Document");
 
 
             modelBuilder.Entity<PreparationDocumentEntity>().ToTable("PreparationDocument");

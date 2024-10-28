@@ -42,6 +42,11 @@ namespace DomainClass.WorkReport
         [InverseProperty(nameof(CityEntity.Missions))]
         [ForeignKey(nameof(CityId))]
         public virtual CityEntity City { get; set; }
+
+
+        [ForeignKey(nameof(ProjectId))]
+        [InverseProperty(nameof(ProjectEntity.Missions))]
+        public virtual ProjectEntity Project { get; set; }
         #endregion
 
 

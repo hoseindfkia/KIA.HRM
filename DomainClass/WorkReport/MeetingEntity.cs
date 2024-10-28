@@ -16,6 +16,10 @@ namespace DomainClass.WorkReport
         #region Relations
         [InverseProperty(nameof(MeetingFileEntity.Meeting))]
         public virtual ICollection<MeetingFileEntity> MeetingFiles { get; set; } = new List<MeetingFileEntity>();
+
+        [ForeignKey(nameof(ProjectId))]
+        [InverseProperty(nameof(ProjectEntity.Meetings))]
+        public virtual ProjectEntity Project { get; set; }
         #endregion
     }
 }

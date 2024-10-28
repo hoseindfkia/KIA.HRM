@@ -15,5 +15,11 @@ namespace Service.WorkReport.PreparationDocument
 
         Task<Feedback<IList<PreparationDocumentViewModel>>> GetByDateAsync(DateTime dateTime, long UserId);
 
+        Task<Feedback<int>> OverlapCheck(DateTime StartDate, DateTime EndDate);
+
+
+        Task<Feedback<int>> DuplicateCheck(DateTime StartDate, DateTime EndDate);
+
+
     }
 }

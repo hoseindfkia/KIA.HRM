@@ -13,5 +13,6 @@ namespace ViewModel.WorkReport.WorkReport
         public TimeOnly TimeStart { get; set; }
         public TimeOnly TimeEnd { get; set; }
         public WorkReportType WorkReportType { get; set; }
+        public long DurationMinuets { get; set; }
     }
 }

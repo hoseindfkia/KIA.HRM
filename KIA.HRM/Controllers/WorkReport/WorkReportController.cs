@@ -40,14 +40,14 @@ namespace KIA.HRM.Controllers.WorkReport
         /// <param name="dateTime"></param>
         /// <returns></returns>
         [HttpGet("GetByDate")]
-        public async Task<Feedback<WorkReportViewModel>> GetByDate(DateTime dateTime)
+        public async Task<Feedback<WorkReportViewModel>> GetByDate(DateTime dateTime)//)string dateTime
         {
             var UserId = 0;//user.identity
             var FbOut = new Feedback<WorkReportViewModel>();
             var leaves = await _leaveService.GetByDateAsync(dateTime, UserId);
             var Meetings = await _meetingService.GetByDateAsync(dateTime, UserId);
-            var Mission = await _missionService.GetByDate(dateTime, UserId);
-            var PreparationDocument = await _preparationDocumentService.GetByDateAsync(dateTime, UserId);
+            var Missions = await _missionService.GetByDate(dateTime, UserId);
+            var PreparationDocuments = await _preparationDocumentService.GetByDateAsync(dateTime, UserId);
 
             //TODO:  ساعت باید از ساعت زن خوانده شود
             TimeOnly startTime = new TimeOnly(7, 30, 0); // 07:30 AM  
@@ -61,101 +61,177 @@ namespace KIA.HRM.Controllers.WorkReport
             {
                 Leaves = leaves.Value,
                 Meetings = Meetings.Value,
-                Missions = Mission.Value,
-                PreparationDocuments = PreparationDocument.Value,
+                Missions = Missions.Value,
+                PreparationDocuments = PreparationDocuments.Value,
                 StartWorkTime = startTime,
                 EndWorkTime = new TimeOnly(17, 0, 0),
                 AllTimeWorked = (long)timeDifference.TotalMinutes,
                 SelectedDayPersian = dateTime.ToPersianDate(),
                 MorningDurationMinuets = (long)morningMinutes.TotalMinutes,
-                NightDurationMinuets = (long)nightMinutes.TotalMinutes + 1
+                NightDurationMinuets = (long)nightMinutes.TotalMinutes + 1,
+                TimeSlot = getTimes(leaves.Value, Meetings.Value, Missions.Value, PreparationDocuments.Value, startTime, endTime)
             };
             return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.FetchSuccessful, Share.Enum.MessageType.Info, WorkReport, "");
         }
 
 
 
-        //TODO: این تابع باید درست شود
-        private WorkReportViewModel getTimes(List<LeaveViewModel> leave,
-                                             List<MeetingViewModel> meeting,
-                                             List<MissionViewModel> mission,
-                                             List<PreparationDocumentViewModel> preparationDocument,
+        //TODO: این تابع باید در شیر قرار گیرد
+        private List<TimeSlotViewModel> getTimes(IList<LeaveViewModel> leave,
+                                             IList<MeetingViewModel> meeting,
+                                             IList<MissionViewModel> mission,
+                                             IList<PreparationDocumentViewModel> preparationDocument,
                                              TimeOnly startTime,
                                               TimeOnly endTime)
         {
-
+            var isAnyWorkReport = false;
             var TimeSlotListFirst = new List<TimeSlotViewModel>();
-            if (leave.Any())
+            var TimeSlotListSorted = new List<TimeSlotViewModel>();
+
+            if (leave != null && leave.Any())
             {
+                var leaveModel = leave.FirstOrDefault();
                 // آیا عملیات در هامان روز است یا انتهای آن به روز های دیگر نیز می انجامد
-                var  isOneDay = leave.FirstOrDefault().FromDatePersian.ToEnglishDateTime() == leave.FirstOrDefault().ToDatePersian.ToEnglishDateTime();
+                var isOneDay = CheckEqualDate((DateTime)leaveModel.FromDatePersian.ToEnglishDateTime() , (DateTime)leaveModel.ToDatePersian.ToEnglishDateTime());
                 var TimeSlot = new TimeSlotViewModel()
                 {
                     TimeStart = getTimeSpanOfDatePersian(leave.FirstOrDefault().FromDatePersian),
-                    TimeEnd  = !isOneDay  ? endTime : getTimeSpanOfDatePersian(leave.FirstOrDefault().ToDatePersian),
+                    TimeEnd = !isOneDay ? endTime : getTimeSpanOfDatePersian(leave.FirstOrDefault().ToDatePersian),
                     Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.leave),
                     WorkReportType = Share.Enum.WorkReportType.leave,
+                    DurationMinuets = leaveModel.DurationMinuets,
                 };
                 TimeSlotListFirst.Add(TimeSlot);
+                isAnyWorkReport = true;
             }
-            if (meeting.Any())
+            if (meeting != null && meeting.Any())
             {
+                var meetingModel = meeting.FirstOrDefault();    
                 // آیا عملیات در هامان روز است یا انتهای آن به روز های دیگر نیز می انجامد
-                var isOneDay = meeting.FirstOrDefault().FromDatePersian.ToEnglishDateTime() == meeting.FirstOrDefault().ToDatePersian.ToEnglishDateTime();
+                var isOneDay = CheckEqualDate((DateTime)meetingModel.FromDatePersian.ToEnglishDateTime() , (DateTime)meetingModel.ToDatePersian.ToEnglishDateTime());
                 var TimeSlot = new TimeSlotViewModel()
                 {
                     TimeStart = getTimeSpanOfDatePersian(meeting.FirstOrDefault().FromDatePersian),
                     TimeEnd = !isOneDay ? endTime : getTimeSpanOfDatePersian(meeting.FirstOrDefault().ToDatePersian),
                     Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.meeting),
                     WorkReportType = Share.Enum.WorkReportType.meeting,
+                    DurationMinuets = meetingModel.DurationMinuets
                 };
                 TimeSlotListFirst.Add(TimeSlot);
+                isAnyWorkReport = true;
             }
-            if (mission.Any())
+            if (mission != null && mission.Any())
             {
+                var missionModel = mission.FirstOrDefault();
                 // آیا عملیات در هامان روز است یا انتهای آن به روز های دیگر نیز می انجامد
-                var isOneDay = mission.FirstOrDefault().FromDatePersian.ToEnglishDateTime() == mission.FirstOrDefault().ToDatePersian.ToEnglishDateTime();
+                var isOneDay = CheckEqualDate((DateTime)missionModel.FromDatePersian.ToEnglishDateTime() , (DateTime)missionModel.ToDatePersian.ToEnglishDateTime());
                 var TimeSlot = new TimeSlotViewModel()
                 {
                     TimeStart = getTimeSpanOfDatePersian(mission.FirstOrDefault().FromDatePersian),
                     TimeEnd = !isOneDay ? endTime : getTimeSpanOfDatePersian(mission.FirstOrDefault().ToDatePersian),
                     Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.mission),
                     WorkReportType = Share.Enum.WorkReportType.mission,
+                    DurationMinuets=missionModel.DurationMinuets
                 };
                 TimeSlotListFirst.Add(TimeSlot);
+                isAnyWorkReport = true;
             }
-            if (preparationDocument.Any())
+            if (preparationDocument != null && preparationDocument.Any())
             {
+                var preparationModel = preparationDocument.FirstOrDefault();
                 // آیا عملیات در هامان روز است یا انتهای آن به روز های دیگر نیز می انجامد
-                var isOneDay = preparationDocument.FirstOrDefault().FromDatePersian.ToEnglishDateTime() == preparationDocument.FirstOrDefault().ToDatePersian.ToEnglishDateTime();
+                var isOneDay = CheckEqualDate((DateTime)preparationModel.FromDatePersian.ToEnglishDateTime() , (DateTime)preparationModel.ToDatePersian.ToEnglishDateTime());
                 var TimeSlot = new TimeSlotViewModel()
                 {
                     TimeStart = getTimeSpanOfDatePersian(preparationDocument.FirstOrDefault().FromDatePersian),
                     TimeEnd = !isOneDay ? endTime : getTimeSpanOfDatePersian(preparationDocument.FirstOrDefault().ToDatePersian),
                     Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.preparationDocument),
                     WorkReportType = Share.Enum.WorkReportType.preparationDocument,
+                    DurationMinuets = preparationModel.DurationMinuets
                 };
                 TimeSlotListFirst.Add(TimeSlot);
+                isAnyWorkReport = true;
             }
 
+            TimeSlotListFirst = TimeSlotListFirst.OrderBy(x => x.TimeStart).ToList();
 
-            TimeOnly time = new TimeOnly(0, 0);
-
-
-            while (time < new TimeOnly(23, 59))
+            TimeOnly time = new TimeOnly(0,0);
+            TimeSlotListSorted.Add(new TimeSlotViewModel()
             {
-                var timeSlot = new TimeSlotViewModel();
+                TimeStart = time,
+                TimeEnd = startTime,
+                Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.morning),
+                WorkReportType = Share.Enum.WorkReportType.morning,
+                DurationMinuets =   (long)(startTime - time).TotalMinutes
+            });
+            time = startTime;
+            if (TimeSlotListFirst.Any())
+            {
 
+            foreach (var timeSlot in TimeSlotListFirst)
+            {
 
+                if (timeSlot.TimeStart > time)
+                {
+                    TimeSlotListSorted.Add(new TimeSlotViewModel()
+                    {
+                        TimeStart = time,
+                        TimeEnd = timeSlot.TimeStart,
+                        Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.nothing),
+                        WorkReportType = Share.Enum.WorkReportType.nothing,
+                        DurationMinuets =(long)(timeSlot.TimeStart- time).TotalMinutes
+                     
+                    });
+                    time = timeSlot.TimeStart;
+                }
+                TimeSlotListSorted.Add(new TimeSlotViewModel()
+                {
+                    TimeStart = timeSlot.TimeStart,
+                    TimeEnd = timeSlot.TimeEnd,
+                    Title = timeSlot.Title,
+                    WorkReportType = timeSlot.WorkReportType,
+                    DurationMinuets = timeSlot.DurationMinuets, 
+                });
+                time = timeSlot.TimeEnd;
+            }
+            }
+            else
+            {
+                TimeSlotListSorted.Add(new TimeSlotViewModel()
+                {
+                    TimeStart = startTime,
+                    TimeEnd = endTime,
+                    Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.nothing),
+                    WorkReportType = Share.Enum.WorkReportType.nothing,
+                    DurationMinuets = (long)(endTime - startTime).TotalMinutes
 
-
-
+                });
             }
 
+            
+            // اگر قبل از آخر وقت هم کاری نبود که انجام داده باشد بای هیچ زده شود 
+            if (time < endTime && isAnyWorkReport)
+            {
+                TimeSlotListSorted.Add(new TimeSlotViewModel()
+                {
+                    TimeStart = time,
+                    TimeEnd = endTime,
+                    Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.nothing),
+                    WorkReportType = Share.Enum.WorkReportType.nothing,
+                    DurationMinuets = (long)(endTime - time).TotalMinutes
+                });
+            }
 
-
-
-            return new WorkReportViewModel();
+            TimeSlotListSorted.Add(new TimeSlotViewModel()
+            {
+                TimeStart = endTime,
+                TimeEnd = new TimeOnly(23,59),
+                Title = Utility.GetDescriptionOfEnum(typeof(Share.Enum.WorkReportType), Share.Enum.WorkReportType.night),
+                WorkReportType = Share.Enum.WorkReportType.night,
+                DurationMinuets = (long)(new TimeOnly(23, 59) - endTime).TotalMinutes
+               
+            });
+            return TimeSlotListSorted;
         }
 
         private TimeOnly getTimeSpanOfDatePersian(string datePersian)
@@ -163,10 +239,14 @@ namespace KIA.HRM.Controllers.WorkReport
             var dateTime = datePersian.ToEnglishDateTime();
             if (dateTime == null)
                 return new TimeOnly(-1);
-            var OutTimeSpan = new TimeOnly(((DateTime)dateTime).Hour, ((DateTime)dateTime).Minute,0);
+            var OutTimeSpan = new TimeOnly(((DateTime)dateTime).Hour, ((DateTime)dateTime).Minute, 0);
             return OutTimeSpan;
         }
 
+        private bool CheckEqualDate(DateTime date1, DateTime date2)
+        {
+            return date1.Date.Equals(date2.Date);
+        }
 
 
         //public static List<Dictionary<string, object>> GenerateWorkSchedule(List<WorkActivity> activities)

@@ -34,8 +34,23 @@ public class ExceptionLoggingMiddleware
         }
         catch (Exception ex)
         {
-
+            //TODO: بادی را باید دریافت کنم
             var BodyRequest = "";
+
+
+            // Enable buffering to allow multiple reads  
+            context.Request.EnableBuffering();
+
+            // Read the request body  
+            string requestBody;
+
+            using (var reader = new StreamReader(context.Request.Body, Encoding.UTF8, leaveOpen: true))
+            {
+                requestBody = await reader.ReadToEndAsync();
+                // Reset the stream position to allow subsequent middlewares to read it  
+                context.Request.Body.Position = 0;
+            }
+
 
             //// Read the request body  
             //using var reader = new StreamReader(context.Request.Body);

@@ -12,6 +12,6 @@ namespace Service.File
 {
     public interface IFileService
     {
-        Task<Feedback<IList<FileEntity>>> AddRangeAsycn(IList<FilePostViewModel> FilePost, long UserId);
+        Task<Feedback<IList<FileEntity>>> AddRangeAsycn(IList<FilePostViewModel> FilePost, long UserId,bool SaveChange=false);
     }
 }

@@ -13,5 +13,10 @@ namespace Service.WorkReport.Meeting
         Task<Feedback<int>> AddAsycn(MeetingPostViewModel MeetingPost, long UserId);
         Task<Feedback<IList<MeetingViewModel>>> GetByDateAsync(DateTime dateTime, long UserId);
 
+        Task<Feedback<int>> OverlapCheck(DateTime StartDate, DateTime EndDate);
+
+        Task<Feedback<int>> DuplicateCheck(DateTime StartDate, DateTime EndDate);
+
+
     }
 }

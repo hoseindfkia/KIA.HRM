@@ -3,6 +3,7 @@ using FileService;
 using Service.CalendarDay;
 using Service.City;
 using Service.Degree;
+using Service.Document;
 using Service.File;
 using Service.Mongo;
 using Service.Project;
@@ -33,6 +34,7 @@ namespace KIA.HRM.Extensions
             Services.AddScoped<ICityService , CityService>();
             Services.AddScoped<IProvinceService , ProvinceService>();
             Services.AddScoped<ICalendarDayService ,CalendarDayService>();
+            Services.AddScoped<IDocumentService ,DocumentService>();
 
 
             // WorkReport

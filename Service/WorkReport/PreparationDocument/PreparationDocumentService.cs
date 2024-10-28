@@ -42,7 +42,7 @@ namespace Service.WorkReport.PreparationDocument
                 UpdatedDate = DateTime.Now,
                 IsAccepted = null,
                 UserCreatorId = null,
-                DocumentId = 0,
+                DocumentId = PreparationDocumentPost.DocumentId,
                 DocumentVersion = PreparationDocumentPost.DocumentVersion,
             };
             _Entity.Add(PreparationDocumentModel);
@@ -53,7 +53,7 @@ namespace Service.WorkReport.PreparationDocument
         public async Task<Feedback<IList<PreparationDocumentViewModel>>> GetByDateAsync(DateTime dateTime, long UserId)
         {
             var FbOut = new Feedback<IList<PreparationDocumentViewModel>>();
-            var PreparationDocumentList = await _Entity.Where(x => x.FromDate.Date == dateTime.Date)
+            var PreparationDocumentList = await _Entity.Include(d => d.Document).Where(x => x.FromDate.Date == dateTime.Date)
                                                         .Select(x => new PreparationDocumentViewModel()
                                                         {
                                                             Title = x.Title,
@@ -61,12 +61,54 @@ namespace Service.WorkReport.PreparationDocument
                                                             FromDatePersian = x.FromDate.ToPersianDate(true),
                                                             ToDatePersian = x.ToDate.ToPersianDate(true),
                                                             DocumentVersion = x.DocumentVersion,
-                                                            DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes
+                                                            DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes,
+                                                            IsAccepted = x.IsAccepted,
+                                                            DocumentName = x.Document.Title
                                                         }).AsNoTracking()
                                                        .ToListAsync();
             if (PreparationDocumentList.Any())
                 return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.FetchSuccessful, Share.Enum.MessageType.Info, PreparationDocumentList, "");
-            return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsNotFound, Share.Enum.MessageType.Warninig, null, "محتوایی یافت نشد");
+            return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsNotFound, Share.Enum.MessageType.Warninig, FbOut.Value, "محتوایی یافت نشد");
+        }
+
+
+
+        /// <summary>
+        /// بررسی همزمان نبود تاریخی که اعلام شده
+        /// به جهت آنکه در صورتی که تاریخی تداخل دارد اجازه ثبت ندهد
+        /// </summary>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <returns></returns>
+        public async Task<Feedback<int>> OverlapCheck(DateTime StartDate, DateTime EndDate)
+        {
+            var Model = await _Entity.Where(x => (x.FromDate < StartDate && x.ToDate > StartDate) ||
+                                                 (x.FromDate < EndDate && x.ToDate > EndDate) ||
+                                                 (x.FromDate > StartDate && x.ToDate < EndDate)).FirstOrDefaultAsync();
+            if (Model == null)
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.FileIsNotFound, Share.Enum.MessageType.Info, 0, "");
+            else
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsIsAvailable, Share.Enum.MessageType.Warninig, 0, "یک تهیه مدرک در زمان مورد نظر ثبت شده است. لطفا تاریخ و ساعت را به درستی وارد نماید");
+
+        }
+
+        /// <summary>
+        /// چک کردن این که آیا در روز جاری تهیه مدرک ثبت شده است یا خیر
+        /// </summary>
+        /// <param name="Date"></param>
+        /// <returns></returns>
+        public async Task<Feedback<int>> DuplicateCheck(DateTime StartDate, DateTime EndDate)
+        {
+            var Model = await _Entity.Where(x => ((x.FromDate < StartDate && x.ToDate > StartDate) ||
+                                                 (x.FromDate < EndDate && x.ToDate > EndDate)) &&
+                                                 x.FromDate.Date == StartDate.Date ||
+                                                 x.FromDate.Date == EndDate.Date ||
+                                                 x.ToDate.Date == StartDate.Date ||
+                                                 x.ToDate.Date == EndDate.Date).FirstOrDefaultAsync();
+            if (Model == null)
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.FileIsNotFound, Share.Enum.MessageType.Info, 0, "");
+            else
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsIsAvailable, Share.Enum.MessageType.Warninig, 0, "یک تهیه مدرک در روز مورد نظر ثبت شده است. لطفا تاریخ و ساعت را به درستی وارد نماید");
         }
     }
 }

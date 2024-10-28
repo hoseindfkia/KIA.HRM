@@ -4,6 +4,7 @@ using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(UnitOfWorkContext))]
-    partial class UnitOfWorkContextModelSnapshot : ModelSnapshot
+    [Migration("20241028082530_meetingToProjectRelation14030807-1")]
+    partial class meetingToProjectRelation140308071
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -674,8 +677,6 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("CityId");
 
-                    b.HasIndex("ProjectId");
-
                     b.ToTable("Mission", (string)null);
                 });
 
@@ -919,15 +920,7 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DomainClass.ProjectEntity", "Project")
-                        .WithMany("Missions")
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("City");
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("DomainClass.WorkReport.MissionFileEntity", b =>
@@ -996,8 +989,6 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("DomainClass.ProjectEntity", b =>
                 {
                     b.Navigation("Meetings");
-
-                    b.Navigation("Missions");
 
                     b.Navigation("ProjectActions");
                 });

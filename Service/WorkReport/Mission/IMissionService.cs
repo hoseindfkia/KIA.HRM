@@ -15,5 +15,11 @@ namespace Service.WorkReport.Mission
 
         Task<Feedback<IList<MissionViewModel>>> GetByDate(DateTime dateTime, long UserId);
 
+        Task<Feedback<int>> OverlapCheck(DateTime StartDate, DateTime EndDate);
+
+
+        Task<Feedback<int>> DuplicateCheck(DateTime StartDate, DateTime EndDate);
+
+
     }
 }

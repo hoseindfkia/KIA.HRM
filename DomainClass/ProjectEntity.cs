@@ -1,4 +1,5 @@
-﻿using Share;
+﻿using DomainClass.WorkReport;
+using Share;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -7,7 +8,7 @@ namespace DomainClass;
 
 public class ProjectEntity : BaseEntity<long>
 {
-    #region لیست فیلد ها
+    #region Fields
 
     [Required]
     [StringLength(Constant.StringLengthTitle)]
@@ -22,14 +23,24 @@ public class ProjectEntity : BaseEntity<long>
     public long UserCreatorId { get; set; }
     #endregion
 
-    #region لیست ارتباطات
-  
+    #region Relations
+
     [InverseProperty(nameof(ProjectActionEntity.Project))]
     public virtual ICollection<ProjectActionEntity> ProjectActions { get; set; } = new List< ProjectActionEntity>();
 
     [InverseProperty(nameof(UserEntity.Projects))]
     [ForeignKey(nameof(UserCreatorId))]
     public virtual UserEntity UserCreator { get; set; }
+
+    [InverseProperty(nameof(MeetingEntity.Project))]
+    public virtual ICollection<MeetingEntity>  Meetings{ get; set; }
+
+
+     [InverseProperty(nameof(MissionEntity.Project))]
+    public virtual ICollection<MissionEntity>  Missions{ get; set; }
+
+
+
     #endregion
 
 }

@@ -103,6 +103,44 @@ namespace Share
         //}
 
 
+        /// <summary>
+        /// تبدیل عددهای فارسی به عدد انگلیسی
+        /// </summary>
+        /// <param ReagentCode=""></param>
+        /// <returns></returns>
+        public static string ReplacingPerNumberToEnNumber(string ReagentCode)
+        {
+            if (ReagentCode != null)
+            {
+                ReagentCode = ReagentCode.Replace('۰', '0');
+                ReagentCode = ReagentCode.Replace('۱', '1');
+                ReagentCode = ReagentCode.Replace('۲', '2');
+                ReagentCode = ReagentCode.Replace('۳', '3');
+                ReagentCode = ReagentCode.Replace('۴', '4');
+                ReagentCode = ReagentCode.Replace("۵", "5");
+                ReagentCode = ReagentCode.Replace("۶", "6");
+                ReagentCode = ReagentCode.Replace("۷", "7");
+                ReagentCode = ReagentCode.Replace("۸", "8");
+                ReagentCode = ReagentCode.Replace("۹", "9");
+            }
+            else
+            {
+                return "";
+            }
+            return ReagentCode;
+        }
+        /// <summary>
+        /// تبدیل رشته ایی به عددی
+        /// </summary>
+        /// <param name="intString"></param>
+        /// <returns></returns>
+        public static int ConvertStringToInt(string intString)
+        {
+            int i = 0;
+            return (Int32.TryParse(intString, out i) ? i : 0);
+        }
+
+
 
 
         #region Date Convert
@@ -141,10 +179,11 @@ namespace Share
         /// </summary>
         /// <param name="jalaliDateString"></param>
         /// <returns></returns>
-        public static DateTime? ToEnglishDateTime(this string jalaliDateString)
+        public static DateTime ToEnglishDateTime(this string jalaliDateString)
         {
             try
             {
+                
                 // Assuming the input format is "YYYY/MM/DD"  
                 var parts = jalaliDateString.Split('-');
                 var datePart = parts[0];
@@ -152,7 +191,8 @@ namespace Share
 
 
                 var dateParts = datePart.Split('/');
-                int year = int.Parse(dateParts[0]);
+               
+                int year = int.Parse( dateParts[0]);
                 int month = int.Parse(dateParts[1]);
                 int day = int.Parse(dateParts[2]);
 
@@ -167,7 +207,8 @@ namespace Share
             }
             catch (Exception)
             {
-                return null;
+                // TODO: خروجی در صورتی که خطا دهد چه باید باشد؟
+                return new DateTime();
             }
         }
 

@@ -16,9 +16,11 @@ namespace ViewModel.WorkReport.Mission
         public string ToDatePersian { get; set; }
         public IList<FileViewModel> Files { get; set; }
         public MissionType MissionType { get; set; }
+        public string MissionTypeName { get; set; }
         public string CityName { get; set; }
 
         public long DurationMinuets { get; set; }
-        //public long ProjectId { get; set; }
+        public bool? IsAccepted { get; set; }
+        public string ProjectName { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using DomainClass;
 using DomainClass.WorkReport;
 using Microsoft.EntityFrameworkCore;
 using Share;
+using Share.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Service.WorkReport.Leave
             //TODO:  ساعت باید از ساعت زن خوانده شود
             TimeOnly startTime = new TimeOnly(7, 30, 0); // 07:30 AM  
             TimeOnly endTime = new TimeOnly(17, 0, 0); // 05:00 PM  
-            DateTime startDate = new DateTime(LeavePost.FromDate.Year, LeavePost.FromDate.Month, LeavePost.FromDate.Day, startTime.Hour,startTime.Minute,0);
+            DateTime startDate = new DateTime(LeavePost.FromDate.Year, LeavePost.FromDate.Month, LeavePost.FromDate.Day, startTime.Hour, startTime.Minute, 0);
             DateTime endDate = new DateTime(LeavePost.ToDate.Year, LeavePost.ToDate.Month, LeavePost.ToDate.Day, endTime.Hour, endTime.Minute, 0);
 
 
@@ -45,10 +46,10 @@ namespace Service.WorkReport.Leave
                 Title = LeavePost.Title,
                 Description = LeavePost.Description,
                 LeaveType = LeavePost.LeaveType,
-                FromDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ? startDate :   LeavePost.FromDate   , // روزانه ها از ساعت تا ساعت ندارد
-                ToDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ?  endDate : LeavePost.ToDate ,// روزانه ها از ساعت تا ساعت ندارد
+                FromDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ? startDate : LeavePost.FromDate, // روزانه ها از ساعت تا ساعت ندارد
+                ToDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ? endDate : LeavePost.ToDate,// روزانه ها از ساعت تا ساعت ندارد
                 ApproverUserId = null,
-                CreatedDate =  DateTime.Now,
+                CreatedDate = DateTime.Now,
                 UpdatedDate = DateTime.Now,
                 IsAccepted = null,
                 UserCreatorId = null,
@@ -74,14 +75,66 @@ namespace Service.WorkReport.Leave
                 Title = x.Title,
                 Description = x.Description,
                 LeaveType = x.LeaveType,
+               // LeaveTypeName = Utility.GetDescriptionOfEnum(typeof(LeaveType), x.LeaveType),
                 FromDatePersian = x.FromDate.ToPersianDate(true),
                 ToDatePersian = x.ToDate.ToPersianDate(true),
-                DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes
+                DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes,
+                IsAccepted = x.IsAccepted
             }
             ).AsNoTracking().ToListAsync();
             if (EntityList.Any())
+            {
+                EntityList = EntityList.Select(x => new LeaveViewModel()
+                {
+                    Title = x.Title,
+                    Description = x.Description,
+                    LeaveType = x.LeaveType,
+                    LeaveTypeName = Utility.GetDescriptionOfEnum(typeof(LeaveType), x.LeaveType),
+                    FromDatePersian = x.FromDatePersian,
+                    ToDatePersian = x.ToDatePersian,
+                    DurationMinuets = x.DurationMinuets,
+                    IsAccepted = x.IsAccepted
+                }).ToList();
                 return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.FetchSuccessful, Share.Enum.MessageType.Info, EntityList, "");
+            }
             return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsNotFound, Share.Enum.MessageType.Warninig, null, "محتوایی یافت نشد");
+        }
+
+        /// <summary>
+        /// بررسی همزمان نبود تاریخی که اعلام شده
+        /// به جهت آنکه در صورتی که تاریخی تداخل دارد اجازه ثبت ندهد
+        /// </summary>
+        /// <param name="StartDate"></param>
+        /// <param name="EndDate"></param>
+        /// <returns></returns>
+        public async Task<Feedback<int>> OverlapCheck(DateTime StartDate, DateTime EndDate)
+        {
+            var Model = await _Entity.Where(x => (x.FromDate < StartDate && x.ToDate > StartDate) ||
+                                                  (x.FromDate < EndDate && x.ToDate > EndDate) ||
+                                                  (x.FromDate > StartDate && x.ToDate < EndDate)).FirstOrDefaultAsync();
+            if (Model == null)
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.FileIsNotFound, Share.Enum.MessageType.Info, 0, "");
+            else
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsIsAvailable, Share.Enum.MessageType.Warninig, 0, "یک مرخصی در زمان مورد نظر ثبت شده است. لطفا تاریخ و ساعت را به درستی وارد نماید");
+        }
+
+        /// <summary>
+        /// چک کردن این که آیا در روز جاری مرخصی ثبت شده است یا خیر
+        /// </summary>
+        /// <param name="Date"></param>
+        /// <returns></returns>
+        public async Task<Feedback<int>> DuplicateCheck(DateTime StartDate, DateTime EndDate)
+        {
+            var Model = await _Entity.Where(x => ((x.FromDate < StartDate && x.ToDate > StartDate) ||
+                                                 (x.FromDate < EndDate && x.ToDate > EndDate)) &&
+                                                 x.FromDate.Date == StartDate.Date ||
+                                                 x.FromDate.Date == EndDate.Date ||
+                                                 x.ToDate.Date == StartDate.Date ||
+                                                 x.ToDate.Date == EndDate.Date).FirstOrDefaultAsync();
+            if (Model == null)
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.FileIsNotFound, Share.Enum.MessageType.Info, 0, "");
+            else
+                return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsIsAvailable, Share.Enum.MessageType.Warninig, 0, "یک مرخصی در روز مورد نظر ثبت شده است. لطفا تاریخ و ساعت را به درستی وارد نماید");
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Share.Enum
         meeting = 4,
         [Description("ماموریت")]
         mission = 5,
-        [Description("ثبت شند")]
+        [Description("تهیه مدرک")]
         preparationDocument = 6,
     }
 }

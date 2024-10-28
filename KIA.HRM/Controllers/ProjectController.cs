@@ -20,7 +20,7 @@ namespace KIA.HRM.Controllers
         }
 
         // GETAll
-       [CustomAuthorization("ProjectList")]
+       //[CustomAuthorization("ProjectList")]
         //[Authorize]
         [HttpGet("GetAll")]
 

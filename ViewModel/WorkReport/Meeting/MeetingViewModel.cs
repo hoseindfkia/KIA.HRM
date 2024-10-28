@@ -18,7 +18,9 @@ namespace ViewModel.WorkReport.Meeting
 
         public long DurationMinuets { get; set; }
 
-        //public long ProjectId { get; set; }
+        public bool? IsAccepted { get; set; }
+     
+        public string    ProjectName { get; set; }
 
     }
 }
