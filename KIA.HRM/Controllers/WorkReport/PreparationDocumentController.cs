@@ -47,9 +47,9 @@ namespace KIA.HRM.Controllers.WorkReport
             var preparationDocument = await _preparationDocumentService.OverlapCheck(PreparationDocumentPost.FromDate, PreparationDocumentPost.ToDate);
             if (preparationDocument.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
                 outMessage += "-" + preparationDocument.ExceptionMessage;
-            var leaveDuplicate = await _preparationDocumentService.DuplicateCheck(PreparationDocumentPost.FromDate, PreparationDocumentPost.ToDate);
-            if (leaveDuplicate.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
-                outMessage += "-" + leaveDuplicate.ExceptionMessage;
+            //var leaveDuplicate = await _preparationDocumentService.DuplicateCheck(PreparationDocumentPost.FromDate, PreparationDocumentPost.ToDate);
+            //if (leaveDuplicate.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
+            //    outMessage += "-" + leaveDuplicate.ExceptionMessage;
 
             if (outMessage != "")
                 return (new Feedback<int>()).SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsIsAvailable, Share.Enum.MessageType.Error, 0, outMessage);

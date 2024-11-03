@@ -35,21 +35,30 @@ namespace KIA.HRM.Controllers.WorkReport
         public async Task<Feedback<int>> Post(LeavePostViewModel LeavePost)
         {
             var outMessage = "";
-            var leave = await _leaveService.OverlapCheck(LeavePost.FromDate, LeavePost.ToDate);
+            var FromDate = LeavePost.FromDate;
+            var ToDate = LeavePost.ToDate;
+            if (LeavePost.LeaveType == Share.Enum.LeaveType.Daily || LeavePost.LeaveType == Share.Enum.LeaveType.Illness)
+            {
+                FromDate = new DateTime(LeavePost.FromDate.Year, LeavePost.FromDate.Month, LeavePost.FromDate.Day, 0, 0, 0);
+                ToDate = new DateTime(LeavePost.ToDate.Year, LeavePost.ToDate.Month, LeavePost.ToDate.Day, 23, 59, 59, 999);
+            }
+            var leave = await _leaveService.OverlapCheck(FromDate, ToDate);
             if (leave.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
                 outMessage += "-" + leave.ExceptionMessage;
-            var mission = await _missionService.OverlapCheck(LeavePost.FromDate, LeavePost.ToDate);
+            var mission = await _missionService.OverlapCheck(FromDate, ToDate);
             if (mission.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
                 outMessage += "-" + mission.ExceptionMessage;
-            var meeting = await _meetingService.OverlapCheck(LeavePost.FromDate, LeavePost.ToDate);
+            var meeting = await _meetingService.OverlapCheck(FromDate, ToDate);
             if (meeting.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
                 outMessage += "-" + meeting.ExceptionMessage;
-            var preparationDocument = await _preparationDocumentService.OverlapCheck(LeavePost.FromDate, LeavePost.ToDate);
+            var preparationDocument = await _preparationDocumentService.OverlapCheck(FromDate, ToDate);
             if (preparationDocument.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
                 outMessage += "-" + preparationDocument.ExceptionMessage;
-            var leaveDuplicate = await _leaveService.DuplicateCheck(LeavePost.FromDate, LeavePost.ToDate);
-            if (leaveDuplicate.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
-                outMessage += "-" +leaveDuplicate.ExceptionMessage;
+
+
+            //var leaveDuplicate = await _leaveService.DuplicateCheck(LeavePost.FromDate, LeavePost.ToDate);
+            //if (leaveDuplicate.Status == Share.Enum.FeedbackStatus.DataIsIsAvailable)
+            //    outMessage += "-" +leaveDuplicate.ExceptionMessage;
 
             if (outMessage != "")
                 return (new Feedback<int>()).SetFeedbackNew(Share.Enum.FeedbackStatus.DataIsIsAvailable, Share.Enum.MessageType.Error, 0, outMessage);

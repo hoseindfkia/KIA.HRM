@@ -56,6 +56,7 @@ namespace Service.WorkReport.PreparationDocument
             var PreparationDocumentList = await _Entity.Include(d => d.Document).Where(x => x.FromDate.Date == dateTime.Date)
                                                         .Select(x => new PreparationDocumentViewModel()
                                                         {
+                                                            Id = x.Id,
                                                             Title = x.Title,
                                                             Description = x.Description,
                                                             FromDatePersian = x.FromDate.ToPersianDate(true),

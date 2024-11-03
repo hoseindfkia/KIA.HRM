@@ -74,6 +74,7 @@ namespace Service.WorkReport.Meeting
             var FbOut = new Feedback<IList<MeetingViewModel>>();
             var MeetingList = await _Entity.Include(p=> p.Project).Where(x => x.FromDate.Date == dateTime.Date).Select(x => new MeetingViewModel()
             {
+                Id = x.Id,
                 Title = x.Title,
                 Description = x.Description,
                 FromDatePersian = x.FromDate.ToPersianDate(true),

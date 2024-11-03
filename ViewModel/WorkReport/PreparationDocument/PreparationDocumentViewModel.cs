@@ -8,6 +8,7 @@ namespace ViewModel.WorkReport.PreparationDocument
 {
     public class PreparationDocumentViewModel
     {
+        public long Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string FromDatePersian { get; set; }

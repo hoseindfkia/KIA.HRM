@@ -32,11 +32,11 @@ namespace Service.WorkReport.Leave
         public async Task<Feedback<int>> AddAsycn(LeavePostViewModel LeavePost, long UserId)
         {
 
-            //TODO:  ساعت باید از ساعت زن خوانده شود
-            TimeOnly startTime = new TimeOnly(7, 30, 0); // 07:30 AM  
-            TimeOnly endTime = new TimeOnly(17, 0, 0); // 05:00 PM  
+            // صحبتی که شد در صورتی که مرخصی روزانه یا استحقاقی بخورد باید 24 ساعت ثبت می شود اما مرخصی برای کارمند 8 ساعت محاسبه می شود
+            TimeOnly startTime = new TimeOnly(0, 0, 0); // 00:00 AM  
+            TimeOnly endTime = new TimeOnly(23, 59, 59); // 23:59:59 PM  
             DateTime startDate = new DateTime(LeavePost.FromDate.Year, LeavePost.FromDate.Month, LeavePost.FromDate.Day, startTime.Hour, startTime.Minute, 0);
-            DateTime endDate = new DateTime(LeavePost.ToDate.Year, LeavePost.ToDate.Month, LeavePost.ToDate.Day, endTime.Hour, endTime.Minute, 0);
+            DateTime endDate = new DateTime(LeavePost.ToDate.Year, LeavePost.ToDate.Month, LeavePost.ToDate.Day, endTime.Hour, endTime.Minute, endTime.Second);
 
 
             var FbOut = new Feedback<int>();
@@ -46,8 +46,8 @@ namespace Service.WorkReport.Leave
                 Title = LeavePost.Title,
                 Description = LeavePost.Description,
                 LeaveType = LeavePost.LeaveType,
-                FromDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ? startDate : LeavePost.FromDate, // روزانه ها از ساعت تا ساعت ندارد
-                ToDate = LeavePost.LeaveType == Share.Enum.LeaveType.Daily ? endDate : LeavePost.ToDate,// روزانه ها از ساعت تا ساعت ندارد
+                FromDate = ( LeavePost.LeaveType == LeaveType.Daily || LeavePost.LeaveType == LeaveType.Illness) ? startDate : LeavePost.FromDate, // روزانه ها از ساعت تا ساعت ندارد
+                ToDate = (LeavePost.LeaveType == LeaveType.Daily || LeavePost.LeaveType == LeaveType.Illness) ? endDate : LeavePost.ToDate,// روزانه ها از ساعت تا ساعت ندارد
                 ApproverUserId = null,
                 CreatedDate = DateTime.Now,
                 UpdatedDate = DateTime.Now,
@@ -56,7 +56,7 @@ namespace Service.WorkReport.Leave
             };
             _Entity.Add(LeaveModel);
             await _Context.SaveChangesAsync();
-            return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.UpdatedSuccessful, Share.Enum.MessageType.Info, 1, "");
+            return FbOut.SetFeedbackNew(FeedbackStatus.UpdatedSuccessful, MessageType.Info, 1, "");
         }
 
         /// <summary>
@@ -72,6 +72,7 @@ namespace Service.WorkReport.Leave
 
             var EntityList = await _Entity.Where(x => x.FromDate.Date == dateTime.Date).Select(x => new LeaveViewModel()
             {
+                Id = x.Id,  
                 Title = x.Title,
                 Description = x.Description,
                 LeaveType = x.LeaveType,
@@ -86,6 +87,7 @@ namespace Service.WorkReport.Leave
             {
                 EntityList = EntityList.Select(x => new LeaveViewModel()
                 {
+                    Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
                     LeaveType = x.LeaveType,

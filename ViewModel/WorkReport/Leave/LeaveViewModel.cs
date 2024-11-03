@@ -10,6 +10,7 @@ namespace ViewModel.WorkReport.Leave
 {
     public class LeaveViewModel
     {
+        public long Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string FromDatePersian { get; set; }

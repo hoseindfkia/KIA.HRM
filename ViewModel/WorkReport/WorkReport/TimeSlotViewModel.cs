@@ -9,6 +9,7 @@ namespace ViewModel.WorkReport.WorkReport
 {
     public class TimeSlotViewModel
     {
+        public long Id { get; set; }
         public string Title { get; set; }
         public TimeOnly TimeStart { get; set; }
         public TimeOnly TimeEnd { get; set; }

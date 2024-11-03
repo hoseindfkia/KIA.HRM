@@ -41,18 +41,18 @@ namespace Service.WorkReport.Mission
             /// ابتدا فایل های آپلود شده مسیر و بقیه تنظیماتش در دیتابیس ذخیره شود سپس لیست آن در انتیتی ذخیره گردد.
             var Files = await _fileService.AddRangeAsycn(MissionPost.Files, UserId);
 
-            //TODO:  ساعت باید از ساعت زن خوانده شود
-            TimeOnly startTime = new TimeOnly(7, 30, 0); // 07:30 AM  
-            TimeOnly endTime = new TimeOnly(17, 0, 0); // 05:00 PM  
+            // صحبتی که شد در صورتی که مرخصی روزانه یا استحقاقی بخورد باید 24 ساعت ثبت می شود اما مرخصی برای کارمند 8 ساعت محاسبه می شود
+            TimeOnly startTime = new TimeOnly(0, 0, 0); // 00:00 AM  
+            TimeOnly endTime = new TimeOnly(23, 59, 59); // 23:59:59 PM  
             DateTime startDate = new DateTime(MissionPost.FromDate.Year, MissionPost.FromDate.Month, MissionPost.FromDate.Day, startTime.Hour, startTime.Minute, 0);
-            DateTime endDate = new DateTime(MissionPost.ToDate.Year, MissionPost.ToDate.Month, MissionPost.ToDate.Day, endTime.Hour, endTime.Minute, 0);
+            DateTime endDate = new DateTime(MissionPost.ToDate.Year, MissionPost.ToDate.Month, MissionPost.ToDate.Day, endTime.Hour, endTime.Minute, endTime.Second);
 
             var MissionModel = new MissionEntity()
             {
                 Title = MissionPost.Title,
                 Description = MissionPost.Description,
-                FromDate = MissionPost.MissionType == Share.Enum.MissionType.Daily ? startDate : MissionPost.FromDate, // روزانه ها از ساعت تا ساعت ندارد
-                ToDate = MissionPost.MissionType == Share.Enum.MissionType.Daily ? endDate : MissionPost.ToDate,// روزانه ها از ساعت تا ساعت ندارد
+                FromDate = MissionPost.MissionType == MissionType.Daily ? startDate : MissionPost.FromDate,
+                ToDate = MissionPost.MissionType == MissionType.Daily ? endDate : MissionPost.ToDate,
                 ApproverUserId = null,
                 CreatedDate = DateTime.Now,
                 UpdatedDate = DateTime.Now,
@@ -63,12 +63,12 @@ namespace Service.WorkReport.Mission
                 {
                     File = file
                 }).ToList(),
-                ProjectId = 0,
+                ProjectId = MissionPost.ProjectId,
                 CityId = MissionPost.CityId,
             };
             _Entity.Add(MissionModel);
             await _Context.SaveChangesAsync();
-            return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.UpdatedSuccessful, Share.Enum.MessageType.Info, 1, "");
+            return FbOut.SetFeedbackNew(FeedbackStatus.UpdatedSuccessful, MessageType.Info, 1, "");
             //if (Files.Status == Share.Enum.FeedbackStatus.UpdatedSuccessful)
 
             //{
@@ -89,6 +89,7 @@ namespace Service.WorkReport.Mission
             var MissionList = await _Entity.Include(c => c.City).Where(x => x.FromDate.Date == dateTime.Date || x.ToDate.Date == dateTime.Date)
                                           .Select(x => new MissionViewModel
                                           {
+                                              Id = x.Id,
                                               Title = x.Title,
                                               Description = x.Description,
                                               FromDatePersian = x.FromDate.ToPersianDate(true),
@@ -100,7 +101,7 @@ namespace Service.WorkReport.Mission
                                               //MissionTypeName =  Utility.GetDescriptionOfEnum(typeof(MissionType),x.MissionType),
                                               DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes,
                                               IsAccepted = x.IsAccepted,
-                                              ProjectName  = x.Project.Title
+                                              ProjectName = x.Project.Title
                                           }).AsNoTracking().ToListAsync();
 
 
@@ -110,6 +111,7 @@ namespace Service.WorkReport.Mission
                 // جهت بیرون کشیدن نام نوع شمارشی خطا میداد مجبور شدم دوباره لیست بسازم و مقدارشو پر کنم
                 MissionList = MissionList.Select(x => new MissionViewModel
                 {
+                    Id = x.Id,
                     Title = x.Title,
                     Description = x.Description,
                     FromDatePersian = x.FromDatePersian,
@@ -139,8 +141,8 @@ namespace Service.WorkReport.Mission
         public async Task<Feedback<int>> OverlapCheck(DateTime StartDate, DateTime EndDate)
         {
             var Model = await _Entity.Where(x => (x.FromDate < StartDate && x.ToDate > StartDate) ||
-                                                  (x.FromDate < EndDate && x.ToDate > EndDate)||
-                                                  (x.FromDate > StartDate && x.ToDate< EndDate)).FirstOrDefaultAsync();
+                                                  (x.FromDate < EndDate && x.ToDate > EndDate) ||
+                                                  (x.FromDate > StartDate && x.ToDate < EndDate)).FirstOrDefaultAsync();
             if (Model == null)
                 return new Feedback<int>().SetFeedbackNew(Share.Enum.FeedbackStatus.FileIsNotFound, Share.Enum.MessageType.Info, 0, "");
             else
