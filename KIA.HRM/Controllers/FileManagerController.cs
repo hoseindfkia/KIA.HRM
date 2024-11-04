@@ -5,6 +5,7 @@ using FileService;
 using System.Collections.Generic;
 using DomainClass.Main;
 using Microsoft.Extensions.Options;
+using ViewModel.File;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,51 +31,36 @@ namespace KIA.HRM.Controllers
         /// </summary>
         /// <param name="value"></param>
         [HttpPost("UploadSingleFile")]
-        public Feedback<string> UploadSingleFile(ICollection<IFormFile> files, FormType formType)
+        public Feedback<FilePostViewModel> UploadSingleFile(ICollection<IFormFile> files, FormType formType)
         {
-            Feedback<string> ResultListOut = new Feedback<string>();
+            var ResultListOut = new Feedback<FilePostViewModel>();
             var fileOnRequest = Request.Form.Files[0];
             if (fileOnRequest != null)
             {
                 ResultListOut = _FileManagerService.Add(formType, FileType.Temp, fileOnRequest);
             }
-
-            //if (files.Any())
-            //{
-            //    foreach (var file in files)
-            //    {
-            //        if (file.Length > 0)
-            //        {
-            //            ResultListOut = _FileManagerService.Add(formType, FileType.Temp, file);
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    ResultListOut = _FileManagerService.Add(formType, FileType.Temp, fileOnRequest);
-            //}
             return ResultListOut;
         }
 
 
-        [HttpGet("EncryptionFile")]
-        public Feedback<string> EncryptionFile(FormType FormType, string FilePath, FileType FileTypeForValidation)
-        {
-            return _FileManagerService.EncryptionFile(FormType, FilePath, FileTypeForValidation);
-        }
+        //[HttpGet("EncryptionFile")]
+        //public Feedback<string> EncryptionFile(FormType FormType, string FilePath, FileType FileTypeForValidation)
+        //{
+        //    return _FileManagerService.EncryptionFile(FormType, FilePath, FileTypeForValidation);
+        //}
 
-        [HttpGet("DecryptionFile")]
-        public Feedback<string> DecryptionFile(FormType FormType, string FilePath, FileType FileTypeForValidation)
-        {
-            return _FileManagerService.DecryptionFile(FormType, FilePath, FileTypeForValidation);
-        }
+        //[HttpGet("DecryptionFile")]
+        //public Feedback<string> DecryptionFile(FormType FormType, string FilePath, FileType FileTypeForValidation)
+        //{
+        //    return _FileManagerService.DecryptionFile(FormType, FilePath, FileTypeForValidation);
+        //}
 
-        [HttpGet("UploadToFtpServer")]
-        public Feedback<string> UploadToFtpServer(FormType FormType, string FilePath, FileType FileTypeForValidation)
-        {
-            var ftp = _mySettings.FTPServerAccount;
-            return _FileManagerService.UploadToFtpServer(FormType, FilePath, FileTypeForValidation, ftp);
-        }
+        //[HttpGet("UploadToFtpServer")]
+        //public Feedback<string> UploadToFtpServer(FormType FormType, string FilePath, FileType FileTypeForValidation)
+        //{
+        //    var ftp = _mySettings.FTPServerAccount;
+        //    return _FileManagerService.UploadToFtpServer(FormType, FilePath, FileTypeForValidation, ftp);
+        //}
 
 
         [HttpGet("MoveNew")]

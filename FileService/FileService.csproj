@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DomainClass\DomainClass.csproj" />
     <ProjectReference Include="..\Share\Share.csproj" />
+    <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
   </ItemGroup>
 
 </Project>

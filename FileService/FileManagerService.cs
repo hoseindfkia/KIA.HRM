@@ -16,6 +16,7 @@ using Share.Models;
 using Microsoft.Extensions.Options;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
+using ViewModel.File;
 
 namespace FileService
 {
@@ -46,9 +47,9 @@ namespace FileService
         /// <param name="FileTypeForValidation">نوع فایل آپلود شده بایستی با این نوع مطابقت داشته باشد</param>
         /// <param name="File">فایل آپلود شده</param>
         /// <returns>آدرس لینک فایل ثبت شده</returns>
-        public Feedback<string> Add(FormType FormType, FileType FileTypeForValidation, IFormFile File)
+        public Feedback<FilePostViewModel> Add(FormType FormType, FileType FileTypeForValidation, IFormFile File)
         {
-            Feedback<string> Fb = new Feedback<string>();
+            var FbOut = new Feedback<FilePostViewModel>();
 
             FullFileNameMaker CurrentFileValidation = new FullFileNameMaker(FormType, File, FileTypeForValidation);
             Feedback<IList<string>> FbCurrentFileValidation = CurrentFileValidation.MakeFullFileNameWithSizeValidation();
@@ -81,21 +82,22 @@ namespace FileService
                         }
                     }
 
-
-                    Fb.SetFeedback(FeedbackStatus.RegisteredSuccessful, MessageType.Info, FullFileNameLink, null, "");
+                    var FilePost = new FilePostViewModel()
+                    {
+                        FileName = File.FileName,
+                        FileType = FileTypeForValidation,
+                        FormType = FormType,
+                        Url = FullFileNameLink
+                    };
+                    return FbOut.SetFeedbackNew(FeedbackStatus.RegisteredSuccessful, MessageType.Info, FilePost, "");
                 }
                 //در صورتی که امکان ثبت فایل در سرور نباشد
                 catch (Exception Ex)
                 {
-                    Fb.SetFeedback(FeedbackStatus.CouldNotConnectToServer, MessageType.Error, null, Ex.Message);
+                    return FbOut.SetFeedbackNew(FeedbackStatus.CouldNotConnectToServer, MessageType.Error, null, Ex.Message);
                 }
             }
-            else
-            {
-                Fb.SetFeedback(FbCurrentFileValidation.Status, FbCurrentFileValidation.MessageType, null, "");
-            }
-
-            return Fb;
+            return FbOut.SetFeedbackNew(FbCurrentFileValidation.Status, FbCurrentFileValidation.MessageType, null, "");
         }
 
         /// <summary>

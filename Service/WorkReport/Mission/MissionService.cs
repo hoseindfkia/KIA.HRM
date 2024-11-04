@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ViewModel.File;
 using ViewModel.WorkReport.Meeting;
 using ViewModel.WorkReport.Mission;
 using static System.Net.Mime.MediaTypeNames;
@@ -38,8 +39,11 @@ namespace Service.WorkReport.Mission
         public async Task<Feedback<int>> AddAsycn(MissionPostViewModel MissionPost, long UserId)
         {
             var FbOut = new Feedback<int>();
+            // فایل ها باید به فولدر مربوط به خود انتقال پیدا کند
+            //var MovedFiles = 
+
             /// ابتدا فایل های آپلود شده مسیر و بقیه تنظیماتش در دیتابیس ذخیره شود سپس لیست آن در انتیتی ذخیره گردد.
-            var Files = await _fileService.AddRangeAsycn(MissionPost.Files, UserId);
+            var Files = await _fileService.AddRangeAsycn(MissionPost.Files, UserId,true);
 
             // صحبتی که شد در صورتی که مرخصی روزانه یا استحقاقی بخورد باید 24 ساعت ثبت می شود اما مرخصی برای کارمند 8 ساعت محاسبه می شود
             TimeOnly startTime = new TimeOnly(0, 0, 0); // 00:00 AM  
@@ -61,7 +65,9 @@ namespace Service.WorkReport.Mission
                 MissionType = MissionPost.MissionType,
                 MissionFiles = Files.Value?.Select(file => new MissionFileEntity()
                 {
-                    File = file
+                   // File = file,
+                    CreatedDate = DateTime.Now,
+                    FileId = file.Id,
                 }).ToList(),
                 ProjectId = MissionPost.ProjectId,
                 CityId = MissionPost.CityId,
@@ -95,8 +101,10 @@ namespace Service.WorkReport.Mission
                                               FromDatePersian = x.FromDate.ToPersianDate(true),
                                               ToDatePersian = x.ToDate.ToPersianDate(true),
                                               CityName = x.City.Title,
-                                              //Files = x.MeetingFiles.Select(x => new MeetingFileEntity() { 
-                                              //}).ToList(),
+                                              Files = x.MissionFiles.Select(f => new FileViewModel() { 
+                                                  FileName = f.File.FileName,
+                                                  Url = f.File.Url,
+                                              }).ToList(),
                                               MissionType = x.MissionType,
                                               //MissionTypeName =  Utility.GetDescriptionOfEnum(typeof(MissionType),x.MissionType),
                                               DurationMinuets = (long)(x.ToDate - x.FromDate).TotalMinutes,
@@ -121,7 +129,8 @@ namespace Service.WorkReport.Mission
                     MissionTypeName = Utility.GetDescriptionOfEnum(typeof(MissionType), x.MissionType),
                     DurationMinuets = x.DurationMinuets,
                     IsAccepted = x.IsAccepted,
-                    ProjectName = x.ProjectName
+                    ProjectName = x.ProjectName,
+                    Files = x.Files
                 }).ToList();
 
                 return FbOut.SetFeedbackNew(Share.Enum.FeedbackStatus.FetchSuccessful, Share.Enum.MessageType.Info, MissionList, "");
